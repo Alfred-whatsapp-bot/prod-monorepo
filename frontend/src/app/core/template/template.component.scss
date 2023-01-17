@@ -1,0 +1,19 @@
+.layout-wrapper {
+    width: 100%;
+
+    .menu-content-wrapper {
+        display: flex;
+        margin: 0;
+        padding: 0;
+
+        .menu-lateral {
+            width: 12vw;
+            padding: 0;
+        }
+
+        .content {
+            padding: 0;
+            width: 100%;
+        }
+    }
+}

@@ -1,0 +1,52 @@
+<app-template>
+    <div class="opcao-container">
+        <h1>Configuração do Atendimento</h1>
+        <div class="card-expansivel" (click)="opcaoMenu = !opcaoMenu">
+            <div>
+                <p>Opções de Menu</p>
+            </div>
+            <div *ngIf="!opcaoMenu">
+                <fa-icon [icon]="faArrowDown"></fa-icon>
+            </div>
+            <div *ngIf="opcaoMenu">
+                <fa-icon [icon]="faArrowUp"></fa-icon>
+            </div>
+        </div>
+        <div class="secoes-container" *ngIf="opcaoMenu">
+            <h3>Seções Disponíveis</h3>
+
+            <div class="lista-secoes-tabela-container">
+                <div class="separador">
+                    <div class="lista-secoes">
+                        <div *ngFor="let secao of listaSecoes"
+                            [ngClass]="secaoSelecionada === secao.nome ? 'secao-selecionada' : 'secao'"
+                            (click)="setSecaoSelecionada(secao)">
+                            <span>{{secao.nome}}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <hr [width]="listaSecoes.length ? listaSecoes.length * 30 : 50">
+                    </div>
+                </div>
+                <div class="tabela-itens-secao">
+                    <table>
+                        <div *ngFor="let item of items">
+                            <tr class="item col-12">
+                                <td class="nome col-4">
+                                    <span>{{item.nome}}</span>
+                                </td>
+                                <td class="valor col-8">
+                                    <span>{{item.valor|currencyFormat}}</span>
+                                </td>
+                            </tr>
+                        </div>
+                    </table>
+                </div>
+                <div>
+                    <button (click)="navigateTo()">Editar</button>
+                    <button (click)="navigateTo()">Incluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-template>

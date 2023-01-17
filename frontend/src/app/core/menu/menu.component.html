@@ -1,0 +1,26 @@
+<div class="col-12">
+    <div class="menu">
+        <ul>
+            <li [ngClass]="menuSelecionado === 'pagina-inicial' ? 'menuClicado' : 'opcaoMenu'" (click)="navigateTo('pagina-inicial')">
+                <fa-icon [icon]="faHome"></fa-icon>
+                <span class="px-2">Página Inicial</span>
+            </li>
+            <li [ngClass]="menuSelecionado === 'atendimentos' ? 'menuClicado' : 'opcaoMenu'" (click)="navigateTo('atendimentos')">
+                <fa-icon [icon]="faUserFriends"></fa-icon>
+                <span class="px-2">Atendimentos</span>
+            </li>
+            <li [ngClass]="menuSelecionado === 'relatorios' ? 'menuClicado' : 'opcaoMenu'" (click)="navigateTo('relatorios')">
+                <fa-icon [icon]="faPoll"></fa-icon>
+                <span class="px-2">Relatórios</span>
+            </li>
+            <li [ngClass]="menuSelecionado === 'configuracao' ? 'menuClicado' : 'opcaoMenu'" (click)="navigateTo('configuracao')">
+                <fa-icon [icon]="faTools"></fa-icon>
+                <span class="px-2">Configuração</span>
+            </li>
+            <li [ngClass]="menuSelecionado === 'sair' ? 'menuClicado' : 'opcaoMenu'" (click)="navigateTo('sair')">
+                <fa-icon [icon]="faDoorOpen"></fa-icon>
+                <span class="px-2">Sair</span>
+            </li>
+        </ul>
+    </div>
+</div>
