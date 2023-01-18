@@ -1,6 +1,6 @@
 <app-template>
   <div class="container">
-    <br />
+    <br/>
     Status: {{ status == "CONNECTED" ? "CONECTADO" : "DESCONECTADO"
     }}<span id="status" class="data"></span>
     <div *ngIf="qrCode !== '' && status !== 'CONNECTED'; else showThis">
@@ -8,11 +8,11 @@
       <img [src]="qrCode" alt="Image Source" />
     </div>
     <ng-template #showThis>
-      <br />
+      <br/>
       <h2>Controles</h2>
       <button (click)="stop()" id="stop">Parar</button>
       <button (click)="start()" id="start">Reiniciar</button>
-      <br
-    /></ng-template>
+      <br/>
+    </ng-template>
   </div>
 </app-template>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ApiConnectionService } from 'src/app/services/api-connection.service';
 
 @Component({
   selector: 'app-pagina-inicial',
@@ -12,40 +12,49 @@ export class PaginaInicialComponent implements OnInit {
   showQrCode = false;
   status: any;
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private apiConnectionSrv: ApiConnectionService
+  ) { }
 
   ngOnInit(): void {
-    this.http.get<any>('/api/data').subscribe((data) => {
+    this.getQrCode();
+    setInterval(() => {
+      this.getStatus();
+    }, 1000);
+  }
+
+  getQrCode() {
+    this.apiConnectionSrv.getQrCode().subscribe((data) => {
       this.qrCode = this.sanitizer.bypassSecurityTrustResourceUrl(
         data.qr.base64Qr
       );
     });
 
-    this.getStatus();
   }
 
   getStatus() {
-    this.http.get<any>('/api/connection').subscribe((data) => {
+    this.apiConnectionSrv.getStatus().subscribe((data) => {
       this.status = data.status;
     });
   }
 
   start() {
-    this.http.get<any>('/api/controls/start').subscribe((data) => {
+    this.apiConnectionSrv.start().subscribe((data) => {
       console.log(data);
       window.location.reload();
     });
   }
 
   stop() {
-    this.http.get<any>('/api/controls/stop').subscribe((data) => {
+    this.apiConnectionSrv.stop().subscribe((data) => {
       console.log(data);
       window.location.reload();
     });
   }
 
   restart() {
-    this.http.get<any>('/api/controls/restart').subscribe((data) => {
+    this.apiConnectionSrv.restart().subscribe((data) => {
       console.log(data);
       window.location.reload();
     });
