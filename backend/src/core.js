@@ -10,6 +10,11 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import { Users } from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import auth from "../middleware/auth.js";
+import bodyParser from "body-parser";
+
 
 /**
  * Logging debug
@@ -143,6 +148,7 @@ export async function session(name, conversation) {
 export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
+  app.use(bodyParser.json()); // support json encoded bodies
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
   //   fs.writeFileSync("logs/conversations.log", "");
