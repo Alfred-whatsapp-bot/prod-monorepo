@@ -9,6 +9,7 @@ import { getPedidos } from "../repositories/pedidoRepository";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import { Users } from "../models/user.model.js";
 
 /**
  * Logging debug
@@ -151,9 +152,7 @@ export async function httpCtrl(name, port) {
   app.use(express.static(path.join(__dirname, "dist")));
   app.use("/index", function (req, res) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
-    const buffer = fs.readFileSync(
-      path.join(__dirname, "dist/index.html")
-    );
+    const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
     res.send(html);
   });
@@ -292,6 +291,89 @@ export async function httpCtrl(name, port) {
     authorize(req, res);
     const pedido = req.body;
     createPedido(pedido);
+  });
+  app.post("/register", async (req, res) => {
+    // Our register logic starts here
+    try {
+      const { nome, email, senha } = req.body;
+      // Validate user input
+      if (!(email && nome && senha)) {
+        res.status(400).send("All input is required");
+      }
+
+      // check if user already exist
+      // Validate if user exist in our database
+      const oldUser = await Users.findOne({ where: { email: email } });
+
+      if (oldUser) {
+        return res.status(409).send("User Already Exist. Please Login");
+      }
+
+      //Encrypt user password
+      const encryptedPassword = await bcrypt.hash(senha, 10);
+
+      // Create user in our database
+      const user = await Users.create({
+        nome,
+        email: email.toLowerCase(), // sanitize: convert email to lowercase
+        senha: encryptedPassword,
+      });
+
+      // Create token
+      const token = jwt.sign(
+        { user_id: user._id, email },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "24h",
+        }
+      );
+      // save user token
+      user.token = token;
+
+      // return new user
+      res.status(201).json(user);
+    } catch (err) {
+      console.log(err);
+    }
+    // Our register logic ends here
+  });
+  app.post("/login", async (req, res) => {
+    let authorized = false;
+    // Our login logic starts here
+    try {
+      // Get user input
+      const { email, senha } = req.body;
+
+      // Validate user input
+      if (!(email && senha)) {
+        res.status(400).send("All input is required");
+      }
+      // Validate if user exist in our database
+      const user = await Users.findOne({ where: { email: email } });
+
+      if (user && (await bcrypt.compare(senha, user.senha))) {
+        // Create token
+        const token = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "2h",
+          }
+        );
+
+        // save user token
+        user.token = token;
+
+        // user
+        res.status(200).json(user);
+        authorized = true;
+        return authorized;
+      } else {
+        res.status(400).json("Invalid Credentials");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   });
 }
 
