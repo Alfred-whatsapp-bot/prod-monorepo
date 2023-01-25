@@ -5,6 +5,7 @@ import { session, log } from "./core";
 import conversation from "./conversations/conversation";
 import conversation1 from "./conversations/conversation1.js";
 //import conversation2 from "./conversations/conversation2.js";
+import { express, router } from "express";
 
 try {
   /* Single WhatsApp account */
@@ -39,3 +40,13 @@ try {
   console.log("error", error.toString());
   log("Error", `${error.toString()} Please try restarting the bot`);
 }
+
+router.get('/', (req, res) => {
+  res.send('List of products');
+});
+
+router.get('/:id', (req, res) => {
+  res.send(`Product ${req.params.id}`);
+});
+
+module.exports = router;
