@@ -2,9 +2,11 @@ import { buttons } from "../helpers";
 //import { getAllMessages } from "../repositories/messageRepository.js";
 import { Messages } from "./message.model";
 
-export const getAllMessages = async () => {
+// const buttons = require("../helpers");
+// const Messages = require("./message.model");
+
+const getAllMessages = async () => {
   const messages = await Messages.findAll();
-  console.log(messages);
   return messages;
 };
 
@@ -44,4 +46,5 @@ for (const message of messages) {
   array.push(filteredObj);
 }
 
+// module.exports = array;
 export default array;

@@ -1,21 +1,16 @@
 import verify from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
-const config = process.env;
-
-const verifyToken = (req, res, next) => {
-  const token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
-
+export const verifyToken = (req, res, next) => {
   if (!token) {
     return res.status(403).send("A token is required for authentication");
   }
   try {
-    const decoded = verify(token, config.TOKEN_KEY);
+    const decoded = verify(token, process.env.TOKEN_KEY);
     req.user = decoded;
   } catch (err) {
     return res.status(401).send("Invalid Token");
   }
   return next();
 };
-
-export default verifyToken;

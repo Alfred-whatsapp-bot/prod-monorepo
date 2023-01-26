@@ -5,15 +5,16 @@ import fs from "fs";
 import http from "http";
 import { exec } from "child_process";
 import mime from "mime-types";
-import { getPedidos } from "../repositories/pedidoRepository";
+import { getPedidos, createPedido } from "../repositories/pedidoRepository";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import jwt from "jsonwebtoken";
 import cors from "cors";
 import { Users } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import auth from "../middleware/auth.js";
 import bodyParser from "body-parser";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 /**
  * Logging debug
@@ -106,14 +107,14 @@ export async function session(name, conversation) {
       .then(async (client) => {
         await start(client, conversation);
         // const hostDevice = await client.getHostDevice();
-        const me = (await client.getAllContacts()).find((o) => o.isMe);
-        const hostDevice = {
-          id: { _serialized: me.id._serialized },
-          formattedTitle: me.formattedName,
-          displayName: me.displayName,
-          isBusiness: me.isBusiness,
-          imgUrl: me.profilePicThumbObj.img,
-        };
+        // const me = (await client.getAllContacts()).find((o) => o.isMe);
+        // const hostDevice = {
+        //   id: { _serialized: me.id._serialized },
+        //   formattedTitle: me.name,
+        //   displayName: me.pushname,
+        //   isBusiness: me.isBusiness,
+        //   imgUrl: me.profilePicThumbObj.img,
+        // };
         const wWebVersion = await client.getWAVersion();
         const groups = (await client.getAllChats())
           .filter((chat) => chat.isGroup)
@@ -132,11 +133,11 @@ export async function session(name, conversation) {
           fs.writeFileSync(
             `tokens/${name}/info.json`,
             JSON.stringify({
-              id: hostDevice.id._serialized,
-              formattedTitle: hostDevice.formattedTitle,
-              displayName: hostDevice.displayName,
-              isBusiness: hostDevice.isBusiness,
-              imgUrl: hostDevice.imgUrl,
+              // id: hostDevice.id._serialized,
+              // formattedTitle: hostDevice.formattedTitle,
+              // displayName: hostDevice.displayName,
+              // isBusiness: hostDevice.isBusiness,
+              // imgUrl: hostDevice.imgUrl,
               wWebVersion,
               groups,
             })
@@ -178,8 +179,76 @@ export async function httpCtrl(name, port) {
       `[${name}] Http chatbot control running on http://localhost:${port}/`
     );
   });
-  app.get("/api/data", (req, res, next) => {
+  const authenticate = async (req, res, next) => {
+    let authorized = false;
+    const tokenCheck = req.headers["authorization"];
+    const { email, senha } = req.body;
+
+    if (tokenCheck) {
+      const authToken = tokenCheck.split(" ")[1];
+      const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
+      if (decoded) {
+        authorized = true;
+        req.email = decoded;
+        //res.status(200).json(decoded.email);
+        next();
+        return authorized;
+      }
+    }
+
+    if (email && senha) {
+      const user = await Users.findOne({ where: { email: email } });
+      if (user && (await bcrypt.compare(senha, user.senha))) {
+        // Create token
+        const token = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "2h",
+          }
+        );
+        // save user token in database
+        user.token = token;
+        await user.save();
+        // user
+        res.status(200).json(user);
+        authorized = true;
+        return authorized;
+      }
+    }
+
+    if (!authorized) res.status(400).json("Invalid Credentials");
+  };
+  app.post("/api/startBot", authenticate, (req, res, next) => {
+    const name = req.email.email;
+    const { conversationName } = req.body;
+    const conversationPath = `conversations/${conversationName}.js`;
+    let array = [];
+    const conversation = fs.readFile(
+      path.join(__dirname, conversationPath),
+      "utf-8",
+      (err, data) => {
+        if (err) {
+          throw err;
+        }
+        const exported = import(`./conversations/${conversationName}.js`);
+        exported.then((module) => {
+          array = module.default;
+          if (!name || !array) {
+            res.status(500).send("Something went wrong with session params.");
+          } else {
+            console.log(array);
+            session(name, array);
+            res.status(200).send("Bot started");
+          }
+        });
+      }
+    );
+  });
+  app.get("/api/data", authenticate, (req, res, next) => {
     //authorize(req, res);
+    console.log(req.email.email);
+    const name = req.email.email;
     const infoPath = `tokens/${name}/info.json`;
     const qrPath = `tokens/${name}/qr.json`;
     const sessPath = `tokens/${name}/session.json`;
@@ -203,33 +272,9 @@ export async function httpCtrl(name, port) {
       logs: logs,
     });
   });
-  // const authorize = (req, res) => {
-  //   const reject = () => {
-  //     res.setHeader("www-authenticate", "Basic");
-  //     res.sendStatus(401);
-  //   };
-  //   const authorization = req.headers.authorization;
-  //   if (!authorization) {
-  //     return reject();
-  //   }
-  //   const [username, password] = Buffer.from(
-  //     authorization.replace("Basic ", ""),
-  //     "base64"
-  //   )
-  //     .toString()
-  //     .split(":");
-
-  //   if (
-  //     !(
-  //       username === chatbotOptions.httpCtrl.username &&
-  //       password === chatbotOptions.httpCtrl.password
-  //     )
-  //   ) {
-  //     return reject();
-  //   }
-  // };
-  app.get("/api/connection", async (req, res, next) => {
+  app.get("/api/connection", authenticate, async (req, res, next) => {
     //authorize(req, res);
+    const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
     const connection = fs.existsSync(connectionPath)
       ? JSON.parse(fs.readFileSync(connectionPath))
@@ -302,12 +347,20 @@ export async function httpCtrl(name, port) {
   });
   app.get("/api/pedidos", (req, res, next) => {
     //authorize(req, res);
-    getPedidos();
+    getPedidos().then((pedidos) => {
+      res.json(pedidos);
+    });
   });
   app.post("/api/pedidos/create", (req, res, next) => {
-    authorize(req, res);
+    //authorize(req, res);
     const pedido = req.body;
-    createPedido(pedido);
+    try {
+      createPedido(pedido).then((pedido) => {
+        res.json(pedido);
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   });
   app.post("/register", async (req, res) => {
     // Our register logic starts here
@@ -354,53 +407,20 @@ export async function httpCtrl(name, port) {
     }
     // Our register logic ends here
   });
-  app.post("/login", async (req, res) => {
-    let authorized = false;
-    // Our login logic starts here
-    try {
-      // Get user input
-      const { email, senha } = req.body;
-
-      // Validate user input
-      if (!(email && senha)) {
-        res.status(400).send("All input is required");
-      }
-      // Validate if user exist in our database
-      const user = await Users.findOne({ where: { email: email } });
-
-      if (user && (await bcrypt.compare(senha, user.senha))) {
-        // Create token
-        const token = jwt.sign(
-          { user_id: user._id, email },
-          process.env.TOKEN_KEY,
-          {
-            expiresIn: "2h",
-          }
-        );
-
-        // save user token
-        user.token = token;
-
-        // user
-        res.status(200).json(user);
-        authorized = true;
-        return authorized;
-      } else {
-        res.status(400).json("Invalid Credentials");
-      }
-    } catch (err) {
-      console.log(err);
-    }
+  app.post("/login", authenticate, (req, res) => {
+    res.send("Successfully logged in");
   });
 }
-
 /**
  * Start run listener of whatsapp messages
  * @param {Object} client
  * @param {Array} conversation
  */
 export async function start(client, conversation) {
-  log("Start", `Conversation flow (${conversation.length} replies) running...`);
+  log(
+    "Start",
+    `Fluxo de conversação possui (${conversation.length} respostas), \n\n Rodando...`
+  );
   try {
     let sessions = [];
     client.onMessage(async (message) => {

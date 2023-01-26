@@ -2,16 +2,15 @@
 
 // import schedule from "node-schedule";
 import { session, log } from "./core";
-import conversation from "./conversations/conversation";
+import conversation from "./conversations/conversation.js";
 import conversation1 from "./conversations/conversation1.js";
 //import conversation2 from "./conversations/conversation2.js";
-import { express, router } from "express";
 
 try {
   /* Single WhatsApp account */
   /* ------------------------*/
   //await session("chatbotSession", conversation);
-  await session("chatbotSession", conversation);
+  session("chatbotSession", conversation);
   //await session("chatbotSession2", conversation2);
   // OR:
   // const chatbot = await session("chatbotSession", conversation);
@@ -40,13 +39,3 @@ try {
   console.log("error", error.toString());
   log("Error", `${error.toString()} Please try restarting the bot`);
 }
-
-router.get('/', (req, res) => {
-  res.send('List of products');
-});
-
-router.get('/:id', (req, res) => {
-  res.send(`Product ${req.params.id}`);
-});
-
-module.exports = router;
