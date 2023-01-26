@@ -185,14 +185,18 @@ export async function httpCtrl(name, port) {
     const { email, senha } = req.body;
 
     if (tokenCheck) {
-      const authToken = tokenCheck.split(" ")[1];
-      const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
-      if (decoded) {
-        authorized = true;
-        req.email = decoded;
-        //res.status(200).json(decoded.email);
-        next();
-        return authorized;
+      try {
+        const authToken = tokenCheck.split(" ")[1];
+        const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
+        if (decoded) {
+          authorized = true;
+          req.email = decoded;
+          //res.status(200).json(decoded.email);
+          next();
+          return authorized;
+        }
+      } catch (error) {
+        //res.status(403).send(error);
       }
     }
 
@@ -204,7 +208,7 @@ export async function httpCtrl(name, port) {
           { user_id: user._id, email },
           process.env.TOKEN_KEY,
           {
-            expiresIn: "2h",
+            expiresIn: "7 days",
           }
         );
         // save user token in database
@@ -231,7 +235,9 @@ export async function httpCtrl(name, port) {
         if (err) {
           throw err;
         }
-        const exported = import(`./conversations/${conversationName}.js`);
+        const exported = import(
+          `./conversations/${conversationName}.js?param=${name}`
+        );
         exported.then((module) => {
           array = module.default;
           if (!name || !array) {

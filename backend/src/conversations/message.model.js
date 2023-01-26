@@ -67,6 +67,10 @@ export const Messages = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    session: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     timestamps: false,
