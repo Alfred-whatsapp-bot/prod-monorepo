@@ -642,7 +642,8 @@ VALUES (
     '',
     '',
     0,
-    'hi'
+    'hi',
+    ''
   ),
   (
     2,
@@ -654,7 +655,8 @@ VALUES (
     '',
     '',
     0,
-    'test'
+    'test',
+    ''
   );
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */
 ;
