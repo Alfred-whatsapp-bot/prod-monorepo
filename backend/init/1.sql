@@ -661,10 +661,10 @@ VALUES (
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */
 ;
 UNLOCK TABLES;
-
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `senha` varchar(255) NOT NULL,
   `token` varchar(255) DEFAULT NULL,
@@ -674,7 +674,6 @@ CREATE TABLE `user` (
 LOCK TABLES `user` WRITE;
 ;
 INSERT INTO `user`
-VALUES (0, 'email@mail.com', '1234', '');
-
+VALUES (0, 'xomano','email@mail.com', '1234', '');
 ;
 UNLOCK TABLES;
