@@ -51,6 +51,6 @@ services:
       - "8080:80"
     volumes:
       - ./src/dist:/usr/share/nginx/html
-      - default.conf:/etc/nginx/conf.d/default.conf
+      - ./default.conf:/etc/nginx/conf.d/default.conf
     networks:
       - app-tier
