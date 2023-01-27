@@ -1,14 +1,19 @@
 import venom from "venom-bot";
-import { chatbotOptions, venomOptions } from "./config";
+import { venomOptions } from "./config";
 import express from "express";
 import fs from "fs";
-import http from "http";
 import { exec } from "child_process";
 import mime from "mime-types";
-import { getPedidos } from "../repositories/pedidoRepository";
+import { getPedidos, createPedido } from "../repositories/pedidoRepository";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import jwt from "jsonwebtoken";
 import cors from "cors";
+import { Users } from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import bodyParser from "body-parser";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 /**
  * Logging debug
@@ -16,6 +21,22 @@ import cors from "cors";
  * @param {String} message
  */
 export function log(type, message) {
+  const datetime = new Date().toLocaleString();
+  const msg = `[${datetime}] [${type}] ${message.replace(/\n/g, " ")}`;
+  console.log(msg);
+  if (!fs.existsSync("logs")) {
+    fs.mkdirSync("logs", { recursive: true });
+    fs.writeFileSync("logs/logs.log", "");
+  }
+  fs.appendFileSync("logs/logs.log", msg + "\n", "utf8");
+}
+
+/**
+ * Logging debug
+ * @param {String} type
+ * @param {String} message
+ */
+export function logConversationOnly(type, message) {
   const datetime = new Date().toLocaleString();
   const msg = `[${datetime}] [${type}] ${message.replace(/\n/g, " ")}`;
   console.log(msg);
@@ -37,13 +58,9 @@ export function error(message, err) {
   console.error(err);
   if (!fs.existsSync("logs")) {
     fs.mkdirSync("logs", { recursive: true });
-    fs.writeFileSync("logs/conversations.log", "");
+    fs.writeFileSync("logs/logs.log", "");
   }
-  fs.appendFileSync(
-    "logs/conversations.log",
-    msg + " " + err.status + "\n",
-    "utf8"
-  );
+  fs.appendFileSync("logs/logs.log", msg + " " + err.status + "\n", "utf8");
 }
 
 /**
@@ -77,6 +94,10 @@ export async function session(name, conversation) {
         groups: [],
       })
     );
+    fs.writeFileSync(
+      `tokens/${name}/connection.json`,
+      JSON.stringify({ status: "DISCONNECTED" })
+    );
     venom
       .create(
         name,
@@ -97,12 +118,20 @@ export async function session(name, conversation) {
       .then(async (client) => {
         await start(client, conversation);
         // const hostDevice = await client.getHostDevice();
-        // const wWebVersion = await client.getWAVersion();
-        // const groups = (await client.getAllChats())
-        //   .filter((chat) => chat.isGroup)
-        //   .map((group) => {
-        //     return { id: group.id._serialized, name: group.name };
-        //   });
+        // const me = (await client.getAllContacts()).find((o) => o.isMe);
+        // const hostDevice = {
+        //   id: { _serialized: me.id._serialized },
+        //   formattedTitle: me.name,
+        //   displayName: me.pushname,
+        //   isBusiness: me.isBusiness,
+        //   imgUrl: me.profilePicThumbObj.img,
+        // };
+        const wWebVersion = await client.getWAVersion();
+        const groups = (await client.getAllChats())
+          .filter((chat) => chat.isGroup)
+          .map((group) => {
+            return { id: group.id._serialized, name: group.name };
+          });
         setInterval(async () => {
           let status = "DISCONNECTED";
           try {
@@ -120,8 +149,8 @@ export async function session(name, conversation) {
               // displayName: hostDevice.displayName,
               // isBusiness: hostDevice.isBusiness,
               // imgUrl: hostDevice.imgUrl,
-              // wWebVersion,
-              // groups,
+              wWebVersion,
+              groups,
             })
           );
         }, 2000);
@@ -142,8 +171,10 @@ export async function session(name, conversation) {
 export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
+  app.use(bodyParser.json()); // support json encoded bodies
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
+  //   fs.writeFileSync("logs/logs.log", "");
   //   fs.writeFileSync("logs/conversations.log", "");
   // }
   const __filename = fileURLToPath(import.meta.url);
@@ -151,9 +182,7 @@ export async function httpCtrl(name, port) {
   app.use(express.static(path.join(__dirname, "dist")));
   app.use("/index", function (req, res) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
-    const buffer = fs.readFileSync(
-      path.join(__dirname, "dist/index.html")
-    );
+    const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
     res.send(html);
   });
@@ -162,8 +191,80 @@ export async function httpCtrl(name, port) {
       `[${name}] Http chatbot control running on http://localhost:${port}/`
     );
   });
-  app.get("/api/data", (req, res, next) => {
+  const authenticate = async (req, res, next) => {
+    let authorized = false;
+    const tokenCheck = req.headers["authorization"];
+    const { email, senha } = req.body;
+
+    if (tokenCheck) {
+      try {
+        const authToken = tokenCheck.split(" ")[1];
+        const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
+        if (decoded) {
+          authorized = true;
+          req.email = decoded;
+          //res.status(200).json(decoded.email);
+          next();
+          return authorized;
+        }
+      } catch (error) {
+        //res.status(403).send(error);
+      }
+    }
+
+    if (email && senha) {
+      const user = await Users.findOne({ where: { email: email } });
+      if (user && (await bcrypt.compare(senha, user.senha))) {
+        // Create token
+        const token = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "7 days",
+          }
+        );
+        // save user token in database
+        user.token = token;
+        await user.save();
+        // user
+        res.status(200).json(user);
+        authorized = true;
+        return authorized;
+      }
+    }
+
+    if (!authorized) res.status(400).json("Invalid Credentials");
+  };
+  app.post("/api/startBot", authenticate, (req, res, next) => {
+    const name = req.email.email;
+    const { conversationName } = req.body;
+    const conversationPath = `conversations/${conversationName}.js`;
+    let array = [];
+    const conversation = fs.readFile(
+      path.join(__dirname, conversationPath),
+      "utf-8",
+      (err, data) => {
+        if (err) {
+          throw err;
+        }
+        const exported = import(
+          `./conversations/${conversationName}.js?param=${name}`
+        );
+        exported.then((module) => {
+          array = module.default;
+          if (!name || !array) {
+            res.status(500).send("Something went wrong with session params.");
+          } else {
+            session(name, array);
+            res.status(200).send("Bot started");
+          }
+        });
+      }
+    );
+  });
+  app.get("/api/data", authenticate, (req, res, next) => {
     //authorize(req, res);
+    const name = req.email.email;
     const infoPath = `tokens/${name}/info.json`;
     const qrPath = `tokens/${name}/qr.json`;
     const sessPath = `tokens/${name}/session.json`;
@@ -177,6 +278,10 @@ export async function httpCtrl(name, port) {
       ? JSON.parse(fs.readFileSync(sessPath))
       : null;
     const logs = fs
+      .readFileSync("logs/logs.log")
+      .toString()
+      .replace(/\n/g, "<br>");
+    const flow = fs
       .readFileSync("logs/conversations.log")
       .toString()
       .replace(/\n/g, "<br>");
@@ -185,35 +290,12 @@ export async function httpCtrl(name, port) {
       session: sess,
       qr: qr,
       logs: logs,
+      conversation: flow,
     });
   });
-  // const authorize = (req, res) => {
-  //   const reject = () => {
-  //     res.setHeader("www-authenticate", "Basic");
-  //     res.sendStatus(401);
-  //   };
-  //   const authorization = req.headers.authorization;
-  //   if (!authorization) {
-  //     return reject();
-  //   }
-  //   const [username, password] = Buffer.from(
-  //     authorization.replace("Basic ", ""),
-  //     "base64"
-  //   )
-  //     .toString()
-  //     .split(":");
-
-  //   if (
-  //     !(
-  //       username === chatbotOptions.httpCtrl.username &&
-  //       password === chatbotOptions.httpCtrl.password
-  //     )
-  //   ) {
-  //     return reject();
-  //   }
-  // };
-  app.get("/api/connection", async (req, res, next) => {
+  app.get("/api/connection", authenticate, async (req, res, next) => {
     //authorize(req, res);
+    const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
     const connection = fs.existsSync(connectionPath)
       ? JSON.parse(fs.readFileSync(connectionPath))
@@ -274,7 +356,7 @@ export async function httpCtrl(name, port) {
   });
   app.get("/api/controls/log/clear", (req, res, next) => {
     //authorize(req, res);
-    exec("> logs/conversations.log", (err, stdout, stderr) => {
+    exec("> logs/logs.log", (err, stdout, stderr) => {
       if (err) {
         res.json({ status: "ERROR" });
         console.error(err);
@@ -286,22 +368,80 @@ export async function httpCtrl(name, port) {
   });
   app.get("/api/pedidos", (req, res, next) => {
     //authorize(req, res);
-    getPedidos();
+    getPedidos().then((pedidos) => {
+      res.json(pedidos);
+    });
   });
   app.post("/api/pedidos/create", (req, res, next) => {
-    authorize(req, res);
+    //authorize(req, res);
     const pedido = req.body;
-    createPedido(pedido);
+    try {
+      createPedido(pedido).then((pedido) => {
+        res.json(pedido);
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  app.post("/register", async (req, res) => {
+    // Our register logic starts here
+    try {
+      const { nome, email, senha } = req.body;
+      // Validate user input
+      if (!(email && nome && senha)) {
+        res.status(400).send("All input is required");
+      }
+
+      // check if user already exist
+      // Validate if user exist in our database
+      const oldUser = await Users.findOne({ where: { email: email } });
+
+      if (oldUser) {
+        return res.status(409).send("User Already Exist. Please Login");
+      }
+
+      //Encrypt user password
+      const encryptedPassword = await bcrypt.hash(senha, 10);
+
+      // Create user in our database
+      const user = await Users.create({
+        nome,
+        email: email.toLowerCase(), // sanitize: convert email to lowercase
+        senha: encryptedPassword,
+      });
+
+      // Create token
+      const token = jwt.sign(
+        { user_id: user._id, email },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "24h",
+        }
+      );
+      // save user token
+      user.token = token;
+
+      // return new user
+      res.status(201).json(user);
+    } catch (err) {
+      console.log(err);
+    }
+    // Our register logic ends here
+  });
+  app.post("/login", authenticate, (req, res) => {
+    res.send("Successfully logged in");
   });
 }
-
 /**
  * Start run listener of whatsapp messages
  * @param {Object} client
  * @param {Array} conversation
  */
 export async function start(client, conversation) {
-  log("Start", `Conversation flow (${conversation.length} replies) running...`);
+  log(
+    "Start",
+    `Fluxo de conversação possui (${conversation.length} respostas), \n\n Rodando...`
+  );
   try {
     let sessions = [];
     client.onMessage(async (message) => {
@@ -334,8 +474,12 @@ export async function start(client, conversation) {
           if (reply.pattern.test(input)) {
             client.startTyping(message.from);
             log(
-              "Receive",
-              `from: ${message.from}, id: ${reply.id}, parent: ${reply.parent}, pattern: ${reply.pattern}, input: ${input}`
+              "Recebido",
+              `de: ${message.from}, reply_id: ${reply.id}, parent: ${reply.parent}, pattern: ${reply.pattern}, input: ${input}`
+            );
+            logConversationOnly(
+              `Recebido de: ${message.from}`,
+              `Mensagem: ${input}`
             );
             sessions
               .find((o) => o.from === message.from)
@@ -419,7 +563,10 @@ async function watchSendLinkPreview(client, message, reply) {
     await client
       .sendLinkPreview(message.from, reply.link, reply.message)
       .then((result) =>
-        log("Send", `(sendLinkPreview): ${reply.message.substring(0, 40)}...`)
+        logConversationOnly(
+          "Send",
+          `(sendLinkPreview): ${reply.message.substring(0, 40)}...`
+        )
       )
       .catch((err) => error(`(sendLinkPreview): ${err}`));
   }
@@ -445,7 +592,10 @@ async function watchSendButtons(client, message, reply) {
         reply.description
       )
       .then((result) =>
-        log("Send", `(sendButtons): ${reply.message.substring(0, 40)}...`)
+        logConversationOnly(
+          "Send",
+          `(sendButtons): ${reply.message.substring(0, 40)}...`
+        )
       )
       .catch((err) => error("(sendButtons):", err));
   }
@@ -470,14 +620,19 @@ async function watchSendImage(client, message, reply) {
           reply.image.filename
         )
         .then((result) =>
-          log("Send", `(sendImage b64): ${reply.image.filename}`)
+          logConversationOnly(
+            "Send",
+            `(sendImage b64): ${reply.image.filename}`
+          )
         )
         .catch((err) => error("(sendImage b64):", err));
     } else {
       const filename = reply.image.split("/").pop();
       await client
         .sendImage(message.from, reply.image, filename, "")
-        .then((result) => log("Send", `(sendImage): ${reply.image}`))
+        .then((result) =>
+          logConversationOnly("Send", `(sendImage): ${reply.image}`)
+        )
         .catch((err) => error("(sendImage):", err));
     }
   }
@@ -498,13 +653,18 @@ async function watchSendAudio(client, message, reply) {
       await client
         .sendVoiceBase64(message.from, reply.audio.base64)
         .then((result) =>
-          log("Send", `(sendAudio b64): ${reply.audio.filename}`)
+          logConversationOnly(
+            "Send",
+            `(sendAudio b64): ${reply.audio.filename}`
+          )
         )
         .catch((err) => error("(sendAudio b64):", err));
     } else {
       await client
         .sendVoice(message.from, reply.audio)
-        .then((result) => log("Send", `(sendAudio): ${reply.audio}`))
+        .then((result) =>
+          logConversationOnly("Send", `(sendAudio): ${reply.audio}`)
+        )
         .catch((err) => error("(sendAudio):", err));
     }
   }
@@ -526,7 +686,10 @@ async function watchSendText(client, message, reply) {
     await client
       .sendText(message.from, reply.message)
       .then((result) =>
-        log("Send", `(sendText): ${reply.message.substring(0, 40)}...`)
+        logConversationOnly(
+          "Send",
+          `(sendText): ${reply.message.substring(0, 40)}...`
+        )
       )
       .catch((err) => error("(sendText):", err));
   }
@@ -553,7 +716,10 @@ async function watchSendList(client, message, reply) {
         reply.list
       )
       .then((result) =>
-        log("Send", `(sendList): ${reply.message.substring(0, 40)}...`)
+        logConversationOnly(
+          "Send",
+          `(sendList): ${reply.message.substring(0, 40)}...`
+        )
       )
       .catch((err) => error("(sendList):", err));
   }
@@ -577,7 +743,7 @@ async function watchForward(client, message, reply) {
     await client
       .sendText(reply.forward, reply.message)
       .then((result) =>
-        log(
+        logConversationOnly(
           "Send",
           `(forward): to: ${reply.forward} : ${reply.message.substring(
             0,

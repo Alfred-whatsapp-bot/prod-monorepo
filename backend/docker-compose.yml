@@ -6,6 +6,7 @@ networks:
 
 services:
   db:
+    container_name: mysql-db
     image: mysql:latest
     command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
@@ -16,8 +17,8 @@ services:
       MYSQL_USER: docker
       MYSQL_PASSWORD: docker
       MYSQL_DATABASE: alfred_bot
-    # expose:
-    #   - "3308"
+    expose:
+      - "3308"
     ports:
       - "3308:3306"
     volumes:
@@ -39,6 +40,8 @@ services:
     depends_on:
       - db
     #command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; pm2 start src/main.js --node-args='--es-module-specifier-resolution=node' --name alfred-bot && pm2-runtime start src/httpCtrl.js --node-args='--es-module-specifier-resolution=node' --name alfred-bot'
+    environment:
+      DATABASE_URL: mysql://docker:docker@mysql-db:3308/alfred_bot
     networks:
       - app-tier
 

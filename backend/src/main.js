@@ -2,7 +2,7 @@
 
 // import schedule from "node-schedule";
 import { session, log } from "./core";
-import conversation from "./conversations/conversation";
+import conversation from "./conversations/conversation.js";
 import conversation1 from "./conversations/conversation1.js";
 //import conversation2 from "./conversations/conversation2.js";
 
@@ -10,7 +10,7 @@ try {
   /* Single WhatsApp account */
   /* ------------------------*/
   //await session("chatbotSession", conversation);
-  await session("chatbotSession", conversation);
+  session("chatbotSession", conversation);
   //await session("chatbotSession2", conversation2);
   // OR:
   // const chatbot = await session("chatbotSession", conversation);

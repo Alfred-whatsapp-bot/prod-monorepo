@@ -50,6 +50,6 @@ export const venomOptions = {
   disableSpins: true, // Will disable Spinnies animation, useful for containers (docker) for a better log
   disableWelcome: true, // Will disable the welcoming message which appears in the beginning
   updatesLog: true, // Logs info updates automatically in terminal
-  autoClose: false, //60000, // Automatically closes the venom-bot only when scanning the QR code (default 60 seconds, if you want to turn it off, assign 0 or false)
+  autoClose: 0, //60000, // Automatically closes the venom-bot only when scanning the QR code (default 60 seconds, if you want to turn it off, assign 0 or false)
   createPathFileToken: true, //creates a folder when inserting an object in the client's browser, to work it is necessary to pass the parameters in the function create browserSessionToken
 };

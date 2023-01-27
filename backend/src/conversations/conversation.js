@@ -1,19 +1,20 @@
 import { buttons } from "../helpers";
 //import { getAllMessages } from "../repositories/messageRepository.js";
 import { Messages } from "./message.model";
+import url from "url";
+const { URL } = url;
 
-export const getAllMessages = async () => {
-  const messages = await Messages.findAll();
-  console.log(messages);
+const myUrl = new URL(import.meta.url);
+const store = myUrl.searchParams.get("param");
+
+console.log(store);
+
+const getAllMessages = async (store) => {
+  const messages = await Messages.findAll({ where: { session: store } });
   return messages;
 };
 
-/**
- * Chatbot conversation flow
- * Your custom conversation
- */
-
-const messages = await getAllMessages();
+const messages = await getAllMessages(store);
 const array = [];
 
 for (const message of messages) {
