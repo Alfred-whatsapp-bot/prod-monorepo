@@ -213,6 +213,7 @@ export async function httpCtrl(name, port) {
     }
 
     if (email && senha) {
+      try {     
       const user = await Users.findOne({ where: { email: email } });
       if (user && (await bcrypt.compare(senha, user.senha))) {
         // Create token
@@ -231,6 +232,9 @@ export async function httpCtrl(name, port) {
         authorized = true;
         return authorized;
       }
+      } catch (e) {
+    res.status(500).json({error: err})
+  }
     }
 
     if (!authorized) res.status(400).json("Invalid Credentials");
