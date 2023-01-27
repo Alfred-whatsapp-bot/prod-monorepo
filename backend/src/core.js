@@ -233,7 +233,7 @@ export async function httpCtrl(name, port) {
         return authorized;
       }
       } catch (e) {
-    res.status(500).json({error: err})
+    res.status(500).send(e);
   }
     }
 
