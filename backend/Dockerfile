@@ -16,6 +16,7 @@ COPY . /alfred-bot-new
 RUN npm install pm2 -g
 RUN npm install
 COPY ./default.conf /etc/nginx/conf.d/
+COPY ./init /docker-entrypoint-initdb.d
 # CMD pm2 start src/main.js \ 
 #     --node-args='--es-module-specifier-resolution=node' \
 #     --name alfred-bot-new && \
