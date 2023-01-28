@@ -181,7 +181,7 @@ export async function httpCtrl(name, port) {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   app.use(express.static(path.join(__dirname, "dist")));
-  app.use("/", function (req, res) {
+  app.use("/index", function (req, res) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
     const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
