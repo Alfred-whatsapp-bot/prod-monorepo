@@ -190,7 +190,7 @@ export async function httpCtrl(name, port) {
         .redirect(301, `https://${req.headers.host}${req.url}`)
         .send(html);
     }
-    //res.redirect(301, `https://${req.headers.host}${req.url}`).send(html);
+    //res.send(html);
   });
   app.listen(port, () => {
     console.log(
