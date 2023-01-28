@@ -13,9 +13,7 @@ export class AuthService {
   baseUrl: string = "";
 
   constructor(private http: HttpClient) {
-    this.baseUrl = environment.production
-      ? environment.urlApiProd
-      : environment.urlApiDev;
+    this.baseUrl = environment.urlApi;
   }
 
   login(credentials: { email: string; senha: string }): Observable<any> {
