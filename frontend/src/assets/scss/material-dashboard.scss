@@ -1,0 +1,63 @@
+@import "@angular/material/theming";
+@include mat-core();
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url("https://fonts.googleapis.com/css2?family=PT+Serif&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+
+$custom-app-primary: mat-palette($mat-teal, A200);
+$custom-app-secondary: mat-palette($mat-teal, A400);
+$custom-app-warn: mat-palette($mat-teal, A700);
+
+$custom-theme: mat-light-theme(
+  $custom-app-primary,
+  $custom-app-secondary,
+  $custom-app-warn
+);
+
+@include angular-material-theme($custom-theme);
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@import "core/variables";
+@import "core/mixins";
+@import "bootstrap/scss/bootstrap";
+
+// Core Components
+@import "core/buttons";
+@import "core/checkboxes";
+@import "core/radios";
+@import "core/forms";
+@import "core/input-group";
+@import "core/images";
+@import "core/navbar";
+@import "core/alerts";
+@import "core/type";
+@import "core/tabs";
+@import "core/tooltip";
+@import "core/popover";
+@import "core/dropdown";
+@import "core/togglebutton";
+@import "core/ripples";
+@import "core/footers";
+@import "core/sidebar-and-main-panel";
+@import "core/fixed-plugin";
+@import "core/tables";
+@import "core/misc";
+
+@import "core/cards";
+@import "core/cards/card-stats";
+@import "core/cards/card-profile";
+@import "core/cards/card-plain";
+
+//plugin scss
+@import "core/plugins/animate";
+@import "core/plugins/chartist";
+@import "core/plugins/perfect-scrollbar";
+
+@import "core/responsive";
+
+@import "core/angular-modal.scss";

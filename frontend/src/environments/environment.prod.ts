@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  urlApiDev: "http://localhost:3001",
+  urlApiProd: "http://taruma.shop",
 };

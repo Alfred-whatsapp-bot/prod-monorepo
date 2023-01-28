@@ -1,3 +1,28 @@
 div {
-    line-height: 50px;
+  line-height: 50px;
+}
+
+:host ::ng-deep .mat-tab-body-content {
+  overflow: hidden !important;
+}
+
+.mat-tab-label .mat-tab-label-content {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+}
+
+#logs {
+  width: calc(100vw - 498px);
+  font-size: initial;
 }

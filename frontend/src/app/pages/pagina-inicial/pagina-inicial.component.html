@@ -1,18 +1,69 @@
-<app-template>
-  <div class="container">
-    <br />
-    Status: {{ status == "CONNECTED" ? "CONECTADO" : "DESCONECTADO"
-    }}<span id="status" class="data"></span>
-    <div *ngIf="qrCode !== '' && status !== 'CONNECTED'; else showThis">
-      <h2>Escaneie para ligar o bot:</h2>
-      <img [src]="qrCode" alt="Image Source" />
-    </div>
-    <ng-template #showThis>
-      <br />
-      <h2>Controles</h2>
-      <button (click)="stop()" id="stop">Parar</button>
-      <button (click)="start()" id="start">Reiniciar</button>
-      <br
-    /></ng-template>
+<!-- <div class="container">
+  <br />
+  Status: {{ status == "notLogged" ? "DESCONECTADO" : "CONECTADO"
+  }}<span id="status" class="data"></span>
+  <div *ngIf="qrCode !== '' && status !== 'successChat'; else showThis">
+    <h2>Escaneie para ligar o bot:</h2>
+    <img [src]="qrCode" alt="Image Source" />
   </div>
-</app-template>
+  <ng-template #showThis>
+    <br />
+    <h2>Controles</h2>
+    <button (click)="stop()" id="stop">Parar</button>
+    <button (click)="start()" id="start">Reiniciar</button>
+    <br />
+  </ng-template>
+</div> -->
+<div class="main-content">
+  <div class="container-fluid">
+    <mat-tab-group animationDuration="2000ms">
+      <mat-tab label="Controles">
+        <div class="btn-group">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            id="start"
+            (click)="startBot()"
+          >
+            Começar
+          </button>
+          <button
+            mat-raised-button
+            type="submit"
+            class="btn btn-warning"
+            id="stop"
+          >
+            Parar
+          </button>
+          <button
+            mat-raised-button
+            type="submit"
+            class="btn btn-info"
+            id="reload"
+          >
+            Recarregar
+          </button>
+          <button
+            mat-raised-button
+            type="submit"
+            class="btn btn-dark"
+            id="restart"
+          >
+            Reiniciar
+          </button>
+          <button
+            mat-raised-button
+            type="submit"
+            class="btn btn-secondary"
+            id="clearLog"
+          >
+            Limpar Log
+          </button>
+        </div></mat-tab
+      >
+      <mat-tab label="Conversas"><div id="conversation"></div></mat-tab>
+      <mat-tab label="Logs"> <div id="logs"></div></mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
