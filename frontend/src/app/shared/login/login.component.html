@@ -1,0 +1,34 @@
+<div class="container">
+  <form
+    class="form mat-elevation-z8"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <div class="login-title">
+      <img src="../../../assets/img/chatbotIcon.webp" alt="zap" />
+    </div>
+    <mat-form-field class="full-width" appearance="outline">
+      <mat-label>Email</mat-label>
+      <input type="email" matInput formControlName="email" />
+      <mat-error *ngIf="!loginForm.valid"> Email inválido </mat-error>
+    </mat-form-field>
+    <mat-form-field class="full-width" appearance="outline">
+      <mat-label>Senha</mat-label>
+      <input type="password" matInput formControlName="senha" />
+      <mat-error *ngIf="!loginForm.valid"> Senha incorreta </mat-error>
+    </mat-form-field>
+    <div class="btn-group">
+      <button mat-raised-button color="warn" type="submit" [disabled]="true">
+        Registrar
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        type="submit"
+        [disabled]="!loginForm.valid"
+      >
+        Entrar
+      </button>
+    </div>
+  </form>
+</div>

@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { AppRoutingModule } from "./app.routing";
-import { ComponentsModule } from "./components/components.module";
+import { ComponentsModule } from "./shared/shared.module";
 import { AppComponent } from "./app.component";
 import { AdminLayoutComponent } from "./layouts/admin-layout/admin-layout.component";
 import { MatButtonModule } from "@angular/material/button";
@@ -41,7 +41,7 @@ import { OverlayModule } from "@angular/cdk/overlay";
 import { PortalModule } from "@angular/cdk/portal";
 import { UserProfileComponent } from "./pages/perfil/user-profile.component";
 import { TableListComponent } from "./pages/produtos/table-list.component";
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { DashboardComponent } from "./pages/dashboard/dashboard.component";
 
 @NgModule({
   imports: [

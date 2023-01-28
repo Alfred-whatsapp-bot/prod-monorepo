@@ -60,4 +60,8 @@ export class ApiConnectionService {
   getConversation() {
     return this.http.get<any>(`${this.baseUrl}/api/data`, this.httpOptions);
   }
+
+  getConnection() {
+    return this.http.get<any>(`${this.baseUrl}/api/connection`, this.httpOptions);
+  }
 }

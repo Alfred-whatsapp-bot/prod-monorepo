@@ -5,47 +5,51 @@
       <mat-tab label="Controles">
         <div id="Controles">
           <div class="btn-group">
-            <button
-              mat-raised-button
-              type="button"
-              class="btn btn-danger"
-              id="start"
-              (click)="startBot()"
-            >
-              Começar
-            </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-warning"
-              id="stop"
-            >
-              Parar
-            </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-info"
-              id="reload"
-            >
-              Recarregar
-            </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-dark"
-              id="restart"
-            >
-              Reiniciar
-            </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="btn btn-secondary"
-              id="clearLog"
-            >
-              Limpar Log
-            </button>
+            <div *ngIf="connection === 'DISCONNECTED'; else connected">
+              <button
+                mat-raised-button
+                type="button"
+                class="btn btn-danger"
+                id="start"
+                (click)="startBot()"
+              >
+                Começar
+              </button>
+            </div>
+            <ng-template #connected>
+              <button
+                mat-raised-button
+                type="submit"
+                class="btn btn-warning"
+                id="stop"
+              >
+                Parar
+              </button>
+              <button
+                mat-raised-button
+                type="submit"
+                class="btn btn-info"
+                id="reload"
+              >
+                Recarregar
+              </button>
+              <button
+                mat-raised-button
+                type="submit"
+                class="btn btn-dark"
+                id="restart"
+              >
+                Reiniciar
+              </button>
+              <button
+                mat-raised-button
+                type="submit"
+                class="btn btn-secondary"
+                id="clearLog"
+              >
+                Limpar Log
+              </button>
+            </ng-template>
           </div>
         </div></mat-tab
       >

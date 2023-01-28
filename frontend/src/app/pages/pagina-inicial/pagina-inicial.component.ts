@@ -16,6 +16,7 @@ export class PaginaInicialComponent implements OnInit {
   routePath: string;
   intervalLogs: any;
   intervalConversations: any;
+  connection: string;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -44,6 +45,7 @@ export class PaginaInicialComponent implements OnInit {
 
     this.intervalConversations = setInterval(() => {
       this.getConversation();
+      this.getConnection();
     }, 2000);
   }
 
@@ -105,6 +107,12 @@ export class PaginaInicialComponent implements OnInit {
       if (data.conversation !== "" || data.conversation !== null) {
         this.handleTexts(data.conversation, "Conversas");
       }
+    });
+  }
+
+  async getConnection() {
+    this.apiConnectionSrv.getConnection().subscribe((data) => {
+      this.connection = data.status;
     });
   }
 
