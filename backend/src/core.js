@@ -208,36 +208,34 @@ export async function httpCtrl(name, port) {
           return authorized;
         }
       } catch (error) {
-        //res.status(403).send(error);
+        res.status(403).send(error);
       }
     }
 
     if (email && senha) {
-      try {     
-      const user = await Users.findOne({ where: { email: email } });
-      if (user && (await bcrypt.compare(senha, user.senha))) {
-        // Create token
-        const token = jwt.sign(
-          { user_id: user._id, email },
-          process.env.TOKEN_KEY,
-          {
-            expiresIn: "7 days",
-          }
-        );
-        // save user token in database
-        user.token = token;
-        await user.save();
-        // user
-        res.status(200).json(user);
-        authorized = true;
-        return authorized;
-      }
+      try {
+        const user = await Users.findOne({ where: { email: email } });
+        if (user && (await bcrypt.compare(senha, user.senha))) {
+          // Create token
+          const token = jwt.sign(
+            { user_id: user._id, email },
+            process.env.TOKEN_KEY,
+            {
+              expiresIn: "7 days",
+            }
+          );
+          // save user token in database
+          user.token = token;
+          await user.save();
+          // user
+          res.status(200).json(user);
+          authorized = true;
+          return authorized;
+        }
       } catch (e) {
-    res.status(500).send(e);
-  }
+        res.status(500).send(e);
+      }
     }
-
-    if (!authorized) res.status(400).json("Invalid Credentials");
   };
   app.post("/api/startBot", authenticate, (req, res, next) => {
     const name = req.email.email;
