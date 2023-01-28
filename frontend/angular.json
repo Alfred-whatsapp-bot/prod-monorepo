@@ -43,7 +43,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "minify": false,
+                  "minify": true,
                   "inlineCritical": false
                 },
                 "fonts": true
@@ -70,8 +70,8 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "minify": false,
-                  "inlineCritical": true
+                  "minify": true,
+                  "inlineCritical": false
                 },
                 "fonts": true
               },
