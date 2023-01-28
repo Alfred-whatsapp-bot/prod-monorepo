@@ -619,7 +619,7 @@ CREATE TABLE `messages` (
   `image` varchar(255) DEFAULT NULL,
   `end` tinyint DEFAULT NULL,
   `pattern` varchar(255) NOT NULL,
-  `store` varchar(255) DEFAULT NULL,
+  `session` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`message_id`),
   UNIQUE KEY `message_id_UNIQUE` (`message_id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
