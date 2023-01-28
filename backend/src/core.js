@@ -172,6 +172,7 @@ export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json()); // support json encoded bodies
+  app.enable("trust proxy");
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
   //   fs.writeFileSync("logs/logs.log", "");
@@ -184,7 +185,12 @@ export async function httpCtrl(name, port) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
     const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
-    res.send(html);
+    if (req.protocol === "http") {
+      return res
+        .redirect(301, `https://${req.headers.host}${req.url}`)
+        .send(html);
+    }
+    //res.redirect(301, `https://${req.headers.host}${req.url}`).send(html);
   });
   app.listen(port, () => {
     console.log(
