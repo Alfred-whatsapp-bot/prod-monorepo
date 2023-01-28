@@ -185,12 +185,7 @@ export async function httpCtrl(name, port) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
     const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
-    if (req.protocol === "http") {
-      return res
-        .redirect(301, `https://${req.headers.host}${req.url}`)
-        .send(html);
-    }
-    //res.send(html);
+    res.send(html);
   });
   app.listen(port, () => {
     console.log(
