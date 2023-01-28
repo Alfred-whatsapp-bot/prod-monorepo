@@ -8,8 +8,7 @@ import { environment } from "environments/environment";
   providedIn: "root",
 })
 export class AuthService {
-  isLogged = true;
-  isAuthenticationRequired = true;
+  isLogged = environment.logged;
   baseUrl: string = "";
 
   constructor(private http: HttpClient) {

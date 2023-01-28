@@ -13,8 +13,6 @@ import { AuthService } from "./auth.service";
   providedIn: "root",
 })
 export class AuthGuard implements CanActivate {
-  isAuthenticationRequired = true;
-
   constructor(private authService: AuthService, private router: Router) {}
 
   canActivate(
@@ -25,18 +23,11 @@ export class AuthGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    if (route.data.requiresAuth) {
-      this.isAuthenticationRequired = true;
-    }
     if (this.authService.isLoggedIn()) {
       return true;
     } else {
-      if (this.isAuthenticationRequired) {
-        this.router.navigate(["/login"]);
-        return false;
-      } else {
-        return true;
-      }
+      this.router.navigate(["/login"]);
+      return false;
     }
   }
 }
