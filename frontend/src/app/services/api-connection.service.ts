@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 
@@ -62,6 +62,9 @@ export class ApiConnectionService {
   }
 
   getConnection() {
-    return this.http.get<any>(`${this.baseUrl}/api/connection`, this.httpOptions);
+    return this.http.get<any>(
+      `${this.baseUrl}/api/connection`,
+      this.httpOptions
+    );
   }
 }

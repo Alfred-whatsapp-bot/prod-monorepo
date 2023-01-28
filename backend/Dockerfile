@@ -23,5 +23,5 @@ COPY ./init /docker-entrypoint-initdb.d
 CMD pm2-runtime start src/httpCtrl.js \
     --node-args='--es-module-specifier-resolution=node' \
     --name alfred-bot-new \
-    sed -i "s/:3000/:$PORT/g" /etc/nginx/conf.d/ \
+    sed -i "s/:3001/:$PORT/g" /etc/nginx/conf.d/ \
     EXPOSE 3001
