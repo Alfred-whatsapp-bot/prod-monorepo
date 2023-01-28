@@ -181,7 +181,7 @@ export async function httpCtrl(name, port) {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   app.use(express.static(path.join(__dirname, "dist")));
-  app.use("/index", function (req, res) {
+  app.use("/", function (req, res) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
     const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
@@ -391,7 +391,7 @@ export async function httpCtrl(name, port) {
       res.status(500).json({ error: error.message });
     }
   });
-  app.post("/register", async (req, res) => {
+  app.post("/api/register", async (req, res) => {
     // Our register logic starts here
     try {
       const { nome, email, senha } = req.body;
@@ -436,7 +436,7 @@ export async function httpCtrl(name, port) {
     }
     // Our register logic ends here
   });
-  app.post("/login", authenticate, (req, res) => {
+  app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");
   });
 }
