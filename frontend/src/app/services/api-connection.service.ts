@@ -10,8 +10,8 @@ export class ApiConnectionService {
 
   constructor(private http: HttpClient) {
     this.baseUrl = environment.production
-      ? environment.urlApiDev
-      : environment.urlApiProd;
+      ? environment.urlApiProd
+      : environment.urlApiDev;
   }
 
   httpOptions = {

@@ -3,3 +3,18 @@
   right: 0;
   top: 25px;
 }
+
+.form-body {
+  width: 100% !important;
+}
+
+.form {
+  width: 70%;
+  margin: auto;
+}
+
+@media screen and (max-width: 991px) {
+  .card .card-profile {
+    display: none;
+  }
+}

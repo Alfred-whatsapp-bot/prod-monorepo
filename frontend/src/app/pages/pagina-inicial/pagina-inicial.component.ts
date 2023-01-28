@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { ApiConnectionService } from "../../services/api-connection.service";
+import { Router, NavigationStart, NavigationEnd } from "@angular/router";
 
 @Component({
   selector: "app-pagina-inicial",
@@ -12,22 +13,36 @@ export class PaginaInicialComponent implements OnInit {
   showQrCode = false;
   status: any;
   logs: string;
+  routePath: string;
+  intervalLogs: any;
+  intervalConversations: any;
 
   constructor(
     private sanitizer: DomSanitizer,
-    private apiConnectionSrv: ApiConnectionService
-  ) {}
+    private apiConnectionSrv: ApiConnectionService,
+    private router: Router
+  ) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.routePath = event.url;
+      }
+    });
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        clearInterval(this.intervalLogs);
+        clearInterval(this.intervalConversations);
+      }
+    });
+  }
 
   ngOnInit(): void {
-    setInterval(() => {
-      console.log("Rodou setInterval");
+    this.intervalLogs = setInterval(() => {
       this.getStatus();
       this.getLogs();
       this.getQrCode();
     }, 2000);
 
-    setInterval(() => {
-      console.log("Rodou getConversation");
+    this.intervalConversations = setInterval(() => {
       this.getConversation();
     }, 2000);
   }
@@ -78,7 +93,7 @@ export class PaginaInicialComponent implements OnInit {
       this.logs = data.logs;
 
       if (data.logs !== "" || data.logs !== null) {
-        this.handleTexts(data.logs, "logs");
+        this.handleTexts(data.logs, "Logs");
       }
     });
   }
@@ -88,7 +103,7 @@ export class PaginaInicialComponent implements OnInit {
       this.logs = data.conversation;
 
       if (data.conversation !== "" || data.conversation !== null) {
-        this.handleTexts(data.conversation, "conversation");
+        this.handleTexts(data.conversation, "Conversas");
       }
     });
   }
@@ -98,27 +113,36 @@ export class PaginaInicialComponent implements OnInit {
   }
 
   handleTexts(text: string, idHtml: string) {
-    console.log("Rodou handleTexts");
-    text
-      ? text
-          .replace(/\[Receive\]/g, "<span class='yellow'>[Recebido]:</span>")
-          .replace(/\[Send\]/g, "<span class='green'>[Enviado]:</span>")
-          .replace(/\[Error\]/g, "<span class='red'>[Erro]:</span>")
-          .replace(/\[Start\]/g, "<span class='purple'>[Start]:</span>")
-          .replace(/\[Init\]/g, "<span class='purple'>[Iniciando]:</span>")
-          .replace(/\[Stop\]/g, "<span class='red'>[Parou]:</span>")
-          .replace(/\[Restart\]/g, "<span class='red'>[Reiniciou]:</span>")
-          .replace(/\[Reload\]/g, "<span class='red'>[Recarregou]:</span>")
-          .replace(/\[Job\]/g, "<span class='blue'>[Job]:</span>")
-          .replace(/from:/g, "<span class='white'>from:</span>")
-          .replace(/to:/g, "<span class='white'>to:</span>")
-          .replace(/id:/g, "<span class='white'>id:</span>")
-          .replace(/parent:/g, "<span class='white'>parent:</span>")
-          .replace(/pattern:/g, "<span class='white'>pattern:</span>")
-          .replace(/input:/g, "<span class='white'>input:</span>")
-      : "";
+    const getTabSelected = document.querySelector(
+      "div[role='tab'][aria-selected=true] div"
+    ).innerHTML;
+    if (getTabSelected.includes(idHtml)) {
+      const retHtml = text
+        ? text
+            .replace(
+              /\[Receive\]/g,
+              "<span class='bg-warning'>[Recebido]:</span>"
+            )
+            .replace(/\[Send\]/g, "<span class='bg-warning'>[Enviado]:</span>")
+            .replace(/\[Error\]/g, "<span class='red'>[Erro]:</span>")
+            .replace(/\[Start\]/g, "<span class='purple'>[Start]:</span>")
+            .replace(/\[Init\]/g, "<span class='purple'>[Iniciando]:</span>")
+            .replace(/\[Stop\]/g, "<span class='red'>[Parou]:</span>")
+            .replace(/\[Restart\]/g, "<span class='red'>[Reiniciou]:</span>")
+            .replace(/\[Reload\]/g, "<span class='red'>[Recarregou]:</span>")
+            .replace(/\[Job\]/g, "<span class='blue'>[Job]:</span>")
+            .replace(/from:/g, "<span class='white'>from:</span>")
+            .replace(/to:/g, "<span class='white'>to:</span>")
+            .replace(/id:/g, "<span class='white'>id:</span>")
+            .replace(/parent:/g, "<span class='white'>parent:</span>")
+            .replace(/pattern:/g, "<span class='white'>pattern:</span>")
+            .replace(/input:/g, "<span class='white'>input:</span>")
+        : "";
 
-    const objDiv = document.getElementById(idHtml);
-    objDiv.innerHTML = text;
+      if (idHtml !== null) {
+        const objDiv = document.getElementById(idHtml);
+        objDiv.innerHTML = retHtml;
+      }
+    }
   }
 }

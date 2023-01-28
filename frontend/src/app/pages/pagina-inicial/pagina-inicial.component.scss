@@ -26,3 +26,9 @@ div {
   width: calc(100vw - 498px);
   font-size: initial;
 }
+
+@media screen and (max-width: 991px) {
+  .btn-group {
+    flex-wrap: wrap;
+  }
+}
