@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
   logged: false,
-  urlApi: "http://taruma.shop",
+  urlApi: "https://taruma.shop",
 };
