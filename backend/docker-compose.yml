@@ -46,22 +46,22 @@ services:
       - app-tier
 
   web:
-    # image: nginx:latest
-    # ports:
-    #   - "8080:80"
-    # volumes:
-    #   - ./src/dist:/usr/share/nginx/html
-    #   - ./default.conf:/etc/nginx/conf.d/default.conf
-    # networks:
-    #   - app-tier
     image: nginx:latest
     ports:
-      - 8080:80
-      - 443:443
+      - "8080:80"
     volumes:
       - ./src/dist:/usr/share/nginx/html
       - ./default.conf:/etc/nginx/conf.d/default.conf
-      - ./ssl:/etc/nginx/ssl
-    restart: always
     networks:
       - app-tier
+    # image: nginx:latest
+    # ports:
+    #   - 8080:80
+    #   - 443:443
+    # volumes:
+    #   - ./src/dist:/usr/share/nginx/html
+    #   - ./default.conf:/etc/nginx/conf.d/default.conf
+    #   - ./ssl:/etc/nginx/ssl
+    # restart: always
+    # networks:
+    #   - app-tier
