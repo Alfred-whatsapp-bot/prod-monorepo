@@ -401,33 +401,34 @@ export async function httpCtrl(name, port) {
 
       if (oldUser) {
         return res.status(409).send("User Already Exist. Please Login");
+      } else {
+        //Encrypt user password
+        const encryptedPassword = await bcrypt.hash(senha, 10);
+
+        // Create user in our database
+        const user = await Users.create({
+          nome,
+          email: email.toLowerCase(), // sanitize: convert email to lowercase
+          senha: encryptedPassword,
+        });
+
+        // Create token
+        const token = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "24h",
+          }
+        );
+        // save user token
+        user.token = token;
+
+        // return new user
+        res.status(201).json(user);
       }
-
-      //Encrypt user password
-      const encryptedPassword = await bcrypt.hash(senha, 10);
-
-      // Create user in our database
-      const user = await Users.create({
-        nome,
-        email: email.toLowerCase(), // sanitize: convert email to lowercase
-        senha: encryptedPassword,
-      });
-
-      // Create token
-      const token = jwt.sign(
-        { user_id: user._id, email },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "24h",
-        }
-      );
-      // save user token
-      user.token = token;
-
-      // return new user
-      res.status(201).json(user);
     } catch (err) {
       console.log(err);
+      res.sendStatus(403).json(err);
     }
     // Our register logic ends here
   });
