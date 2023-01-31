@@ -16,7 +16,7 @@ export class PaginaInicialComponent implements OnInit {
   routePath: string;
   intervalLogs: any;
   intervalConversations: any;
-  connection: string;
+  connection: string = "DISCONNECTED";
 
   constructor(
     private sanitizer: DomSanitizer,
