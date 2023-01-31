@@ -15,6 +15,15 @@
               >
                 Começar
               </button>
+              <div *ngIf="qrCode !== null">
+                <img src={{ qrCode }} alt="QR Code" class="img-fluid" />
+                <div class="alert alert-warning" role="alert">
+                  <p>
+                    <strong>Atenção!</strong> Para iniciar o bot, você precisa
+                    escanear o QR Code acima.
+                  </p>
+                </div>
+              </div>
             </div>
             <ng-template #connected>
               <button
