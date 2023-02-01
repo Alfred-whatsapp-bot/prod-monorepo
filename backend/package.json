@@ -46,7 +46,7 @@
     "path": "^0.12.7",
     "sequelize": "^6.28.0",
     "sync-fetch": "^0.4.1",
-    "venom-bot": "^4.3.3"
+    "venom-bot": "4.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",

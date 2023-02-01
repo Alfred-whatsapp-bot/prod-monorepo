@@ -4,6 +4,12 @@ import fs from "fs";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
+let clientStorage = [{}];
+
+export async function stop() {
+  clientStorage[0].close();
+}
+
 /**
  * Create a chatbot session
  * @param {String} name
@@ -95,8 +101,8 @@ export async function session(name, conversation) {
             })
           );
         }, 2000);
-        //resolve(client);
-        return client;
+        clientStorage = client;
+        resolve(client);
       })
       .catch((err) => {
         console.error(err);
@@ -186,6 +192,7 @@ export async function start(client, conversation) {
             await watchSendText(client, message, reply);
             await watchSendList(client, message, reply);
             await watchForward(client, message, reply);
+            await watchClose(client, input);
             if (reply.hasOwnProperty("afterReply")) {
               reply.afterReply(message.from, input, parents, media);
             }
@@ -222,6 +229,18 @@ export async function start(client, conversation) {
   } catch (err) {
     client.close();
     error(err);
+  }
+}
+
+/**
+ * Close session
+ * @param {Object} client
+ * @param {Object} message
+ * @param {Object} reply
+ */
+async function watchClose(client, input) {
+  if (input === "fechar") {
+    await client.close();
   }
 }
 

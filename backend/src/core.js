@@ -14,7 +14,7 @@ import bcrypt from "bcryptjs";
 import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-import { session } from "./chatbot.js";
+import { session, stop } from "./chatbot.js";
 
 /**
  * Create a chatbot http Qr login
@@ -25,7 +25,7 @@ export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json()); // support json encoded bodies
-  app.enable("trust proxy");
+  //app.enable("trust proxy");
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
   //   fs.writeFileSync("logs/logs.log", "");
@@ -38,7 +38,7 @@ export async function httpCtrl(name, port) {
     //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
     const buffer = fs.readFileSync(path.join(__dirname, "dist/index.html"));
     let html = buffer.toString();
-    res.send(html);
+    res.sendFile(html);
   });
   app.listen(port, () => {
     console.log(
@@ -93,7 +93,12 @@ export async function httpCtrl(name, port) {
   };
   app.post("/api/handleBot", authenticate, (req, res, next) => {
     const name = req.email.email;
-    const { conversationName } = req.body;
+    const { conversationName, order } = req.body;
+    if (order == "stop") {
+      stop();
+      res.status(200).send(`Bot stopped.`);
+      return;
+    }
     const conversationPath = `conversations/${conversationName}.js`;
     let array = [];
     const conversation = fs.readFile(
@@ -111,7 +116,7 @@ export async function httpCtrl(name, port) {
           if (!name || !array) {
             res.status(500).send("Something went wrong with session params.");
           } else {
-            session(name, array);
+            session(name, array, order);
             res.status(200).send(`Bot started.`);
           }
         });
@@ -172,7 +177,7 @@ export async function httpCtrl(name, port) {
     });
   });
   app.get("/api/controls/stop", (req, res, next) => {
-    //authorize(req, res);
+    authorize(req, res);
     exec("npm run stop", (err, stdout, stderr) => {
       if (err) {
         res.json({ status: "ERROR" });
