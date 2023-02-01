@@ -15,7 +15,7 @@ export class PaginaInicialComponent implements OnInit {
   logs: string;
   routePath: string;
   intervalLogs: any;
-  intervalConversations: any;
+  intervalConnection: any;
   connection: string = "DISCONNECTED";
 
   constructor(
@@ -31,21 +31,23 @@ export class PaginaInicialComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         clearInterval(this.intervalLogs);
-        clearInterval(this.intervalConversations);
+        clearInterval(this.intervalConnection);
       }
     });
   }
 
   ngOnInit(): void {
-    this.intervalLogs = setInterval(() => {
-      this.getStatus();
-      this.getLogs();
-      this.getQrCode();
-    }, 2000);
-
-    this.intervalConversations = setInterval(() => {
-      this.getConversation();
+    this.intervalConnection = setInterval(() => {
       this.getConnection();
+    }, 1000);
+
+    this.intervalLogs = setInterval(() => {
+      if (this.connection === "CONNECTED") {
+        this.getStatus();
+        this.getLogs();
+        this.getQrCode();
+        this.getConversation();
+      }
     }, 2000);
   }
 

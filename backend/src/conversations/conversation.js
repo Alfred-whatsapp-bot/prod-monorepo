@@ -9,12 +9,12 @@ const store = myUrl.searchParams.get("param");
 
 console.log(store);
 
-const getAllMessages = async (store) => {
-  const messages = await Messages.findAll({ where: { session: store } });
-  return messages;
-};
+// const getAllMessages = async (store) => {
+//   const messages = await Messages.findAll({ where: { session: store } });
+//   return messages;
+// };
 
-const messages = await getAllMessages(store);
+const messages = await Messages.findAll({ where: { session: store } });
 const array = [];
 
 for (const message of messages) {

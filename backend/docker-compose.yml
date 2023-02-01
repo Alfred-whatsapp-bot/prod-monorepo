@@ -23,7 +23,7 @@ services:
       - "3308:3306"
     volumes:
       - ./init:/docker-entrypoint-initdb.d
-      - ./data:/var/lib/mysql   
+      - ./data:/var/lib/mysql
     networks:
       - app-tier
 
@@ -41,7 +41,14 @@ services:
       - db
     #command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; pm2 start src/main.js --node-args='--es-module-specifier-resolution=node' --name alfred-bot && pm2-runtime start src/httpCtrl.js --node-args='--es-module-specifier-resolution=node' --name alfred-bot'
     environment:
-      DATABASE_URL: mysql://docker:docker@mysql-db:3308/alfred_bot
+      DB_URL: mysql://docker:docker@mysql-db:3308/alfred_bot
+      NODE_ENV: development
+      TZ: America/Sao_Paulo
+      DB_NAME: alfred_bot
+      DB_USER: docker
+      DB_PASSWORD: docker
+      DB_HOST: mysql-db
+      DB_PORT: "3308"
     networks:
       - app-tier
 

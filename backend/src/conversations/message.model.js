@@ -38,25 +38,6 @@ const sequelize = new Sequelize(
     logging: false,
   }
 );
-// const sequelize = new Sequelize(
-//   `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-// );
-// const sequelize = new Sequelize(
-//
-//   process.env.DB_NAME,
-//   process.env.DB_USER,
-//   process.env.DB_PASSWORD,
-//   {
-//     dialect: "mysql",
-//     pool: {
-//       max: 5,
-//       min: 0,
-//       acquire: 30000,
-//       idle: 10000,
-//     },
-//     logging: false,
-//   }
-// );
 
 export const Messages = sequelize.define(
   "messages",
