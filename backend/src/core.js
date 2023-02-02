@@ -95,7 +95,7 @@ export async function httpCtrl(name, port) {
     const name = req.email.email;
     const { conversationName, order } = req.body;
     if (order == "stop") {
-      stop();
+      stop(name);
       res.status(200).send(`Bot stopped.`);
       return;
     }
@@ -138,6 +138,7 @@ export async function httpCtrl(name, port) {
     const sess = fs.existsSync(sessPath)
       ? JSON.parse(fs.readFileSync(sessPath))
       : null;
+
     const logs = fs
       .readFileSync("logs/logs.log")
       .toString()

@@ -5,18 +5,33 @@
       <mat-tab label="Controles">
         <div id="Controles">
           <div class="btn-group">
-            <div *ngIf="connection === 'DISCONNECTED'; else connected">
-              <button
-                mat-raised-button
-                type="button"
-                class="btn btn-danger"
-                id="start"
-                (click)="startBot()"
-              >
-                Começar
-              </button>
-              <div *ngIf="qrCode !== null">
-                <img src={{ qrCode }} alt="QR Code" class="img-fluid" />
+            <div
+              *ngIf="
+                status === null ||
+                  status === undefined ||
+                  status === 'notLogged';
+                else connected
+              "
+            >
+              <div *ngIf="qrCode === null || qrCode === ''">
+                <button
+                  mat-raised-button
+                  type="button"
+                  class="btn btn-danger"
+                  id="start"
+                  (click)="startBot()"
+                >
+                  Começar
+                </button>
+              </div>
+              <div *ngIf="qrCode !== null || qrCode !== ''">
+                <br />
+                <br />
+                <br />
+                <img [src]="qrCode" alt="QR Code" class="img-fluid" />
+                <br />
+                <br />
+                <br />
                 <div class="alert alert-warning" role="alert">
                   <p>
                     <strong>Atenção!</strong> Para iniciar o bot, você precisa
@@ -28,36 +43,21 @@
             <ng-template #connected>
               <button
                 mat-raised-button
-                type="submit"
+                type="button"
                 class="btn btn-warning"
                 id="stop"
+                (click)="stopBot()"
               >
                 Parar
               </button>
-              <button
-                mat-raised-button
-                type="submit"
-                class="btn btn-info"
-                id="reload"
-              >
-                Recarregar
-              </button>
-              <button
-                mat-raised-button
-                type="submit"
-                class="btn btn-dark"
-                id="restart"
-              >
-                Reiniciar
-              </button>
-              <button
+              <!-- <button
                 mat-raised-button
                 type="submit"
                 class="btn btn-secondary"
                 id="clearLog"
               >
                 Limpar Log
-              </button>
+              </button> -->
             </ng-template>
           </div>
         </div></mat-tab

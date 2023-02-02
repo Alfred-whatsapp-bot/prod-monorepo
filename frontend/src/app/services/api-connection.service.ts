@@ -33,15 +33,16 @@ export class ApiConnectionService {
 
   startBot() {
     return this.http.post<any>(
-      `${this.baseUrl}/api/startBot`,
-      { conversationName: localStorage.getItem("sessionName") },
+      `${this.baseUrl}/api/handleBot`,
+      { conversationName: localStorage.getItem("sessionName"), order: "start" },
       this.httpOptions
     );
   }
 
-  stop() {
-    return this.http.get<any>(
-      `${this.baseUrl}/api/controls/stop`,
+  stopBot() {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/handleBot`,
+      { conversationName: localStorage.getItem("sessionName"), order: "stop" },
       this.httpOptions
     );
   }
@@ -55,6 +56,13 @@ export class ApiConnectionService {
 
   getLogs() {
     return this.http.get<any>(`${this.baseUrl}/api/data`, this.httpOptions);
+  }
+
+  clearLogs() {
+    return this.http.get<any>(
+      `${this.baseUrl}/api/controls/log/clear`,
+      this.httpOptions
+    );
   }
 
   getConversation() {

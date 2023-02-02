@@ -1,15 +1,16 @@
-import { Component, OnInit } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ApiConnectionService } from "../../services/api-connection.service";
 import { Router, NavigationStart, NavigationEnd } from "@angular/router";
+import { interval, Subscription } from "rxjs";
 
 @Component({
   selector: "app-pagina-inicial",
   templateUrl: "./pagina-inicial.component.html",
   styleUrls: ["./pagina-inicial.component.scss"],
 })
-export class PaginaInicialComponent implements OnInit {
-  qrCode: any;
+export class PaginaInicialComponent implements OnInit, OnDestroy {
+  qrCode: SafeUrl;
   showQrCode = false;
   status: any;
   logs: string;
@@ -17,6 +18,7 @@ export class PaginaInicialComponent implements OnInit {
   intervalLogs: any;
   intervalConnection: any;
   connection: string = "DISCONNECTED";
+  subscription: Subscription;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -37,21 +39,33 @@ export class PaginaInicialComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getStatus();
+
+    this.subscription = interval(1000).subscribe(() => {
+      if (this.connection !== "CONNECTED") {
+        console.log("rodou subscription" + this.qrCode);
+        this.getQrCode();
+      }
+    });
+
     this.intervalConnection = setInterval(() => {
       this.getConnection();
+      console.log(this.status);
     }, 1000);
 
     this.intervalLogs = setInterval(() => {
       if (this.connection === "CONNECTED") {
         this.getStatus();
         this.getLogs();
-        this.getQrCode();
         this.getConversation();
       }
+      // else {
+      //   this.getQrCode();
+      // }
     }, 2000);
   }
 
-  getQrCode() {
+  async getQrCode() {
     this.apiConnectionSrv.getQrCode().subscribe((data) => {
       this.qrCode = this.sanitizer.bypassSecurityTrustResourceUrl(
         data.qr.base64Qr
@@ -59,34 +73,20 @@ export class PaginaInicialComponent implements OnInit {
     });
   }
 
-  getStatus() {
+  async getStatus() {
     this.apiConnectionSrv.getStatus().subscribe((data) => {
       this.status = data.session.status;
     });
   }
 
-  start() {
-    this.apiConnectionSrv.start().subscribe((data) => {
-      console.log(data);
-      window.location.reload();
-    });
-  }
-
-  startBot() {
+  async startBot() {
     this.apiConnectionSrv.startBot().subscribe((data) => {
       console.log(data);
     });
   }
 
-  stop() {
-    this.apiConnectionSrv.stop().subscribe((data) => {
-      console.log(data);
-      window.location.reload();
-    });
-  }
-
-  restart() {
-    this.apiConnectionSrv.restart().subscribe((data) => {
+  async stopBot() {
+    this.apiConnectionSrv.stopBot().subscribe((data) => {
       console.log(data);
       window.location.reload();
     });
@@ -154,5 +154,9 @@ export class PaginaInicialComponent implements OnInit {
         objDiv.innerHTML = retHtml;
       }
     }
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }

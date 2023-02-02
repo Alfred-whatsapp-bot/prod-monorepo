@@ -4,10 +4,29 @@ import fs from "fs";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
-let clientStorage = [{}];
+let clientStorage = {};
 
-export async function stop() {
-  clientStorage[0].close();
+export async function stop(name) {
+  const sessPath = `tokens/${name}/session.json`;
+  const sess = fs.existsSync(sessPath)
+    ? JSON.parse(fs.readFileSync(sessPath))
+    : null;
+
+  sess.status = null;
+
+  fs.writeFile(sessPath, JSON.stringify(sess), (error) => {
+    if (error) {
+      console.error(`Error writing to ${sessPath}:`, error);
+      return;
+    }
+    console.log(`Emptied value in ${sessPath}`);
+  });
+
+  if (clientStorage !== null) {
+    let browser;
+    browser = clientStorage.page.browser();
+    browser.close();
+  }
 }
 
 /**
