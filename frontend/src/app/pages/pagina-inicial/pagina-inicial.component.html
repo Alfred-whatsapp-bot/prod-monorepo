@@ -13,7 +13,7 @@
                 else connected
               "
             >
-              <div *ngIf="qrCode === null || qrCode === ''">
+              <div *ngIf="qrCode === null || qrCode === '' || qrCode === undefined">
                 <button
                   mat-raised-button
                   type="button"
@@ -24,7 +24,7 @@
                   Começar
                 </button>
               </div>
-              <div *ngIf="qrCode !== null || qrCode !== ''">
+              <div *ngIf="qrCode !== null || qrCode !== '' || qrCode === undefined">
                 <br />
                 <br />
                 <br />
