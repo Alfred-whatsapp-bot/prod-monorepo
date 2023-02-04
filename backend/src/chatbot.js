@@ -2,6 +2,7 @@ import venom from "venom-bot";
 import { venomOptions } from "./config";
 import fs from "fs";
 import { createRequire } from "module";
+import mime from "mime-types";
 const require = createRequire(import.meta.url);
 
 let clientStorage = {};
