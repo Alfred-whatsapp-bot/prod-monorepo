@@ -15,6 +15,7 @@ import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
+const forceSSL = require('express-force-ssl');
 
 /**
  * Create a chatbot http Qr login
@@ -25,6 +26,7 @@ export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json()); // support json encoded bodies
+  app.use(forceSSL);
   //app.enable("trust proxy");
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
