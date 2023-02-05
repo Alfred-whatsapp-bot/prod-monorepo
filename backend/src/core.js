@@ -26,7 +26,7 @@ export async function httpCtrl(name, port) {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json()); // support json encoded bodies
-  app.use(forceSSL);
+  // app.use(forceSSL);
   //app.enable("trust proxy");
   // if (!fs.existsSync("logs")) {
   //   fs.mkdirSync("logs", { recursive: true });
