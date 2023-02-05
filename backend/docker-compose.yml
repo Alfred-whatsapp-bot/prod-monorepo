@@ -63,7 +63,7 @@ services:
     #   - app-tier
     image: nginx:latest
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     volumes:
       - ./src/dist:/usr/share/nginx/html
