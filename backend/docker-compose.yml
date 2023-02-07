@@ -68,7 +68,7 @@ services:
     volumes:
       - ./src/dist:/usr/share/nginx/html
       - ./default.conf:/etc/nginx/conf.d/default.conf
-      - ./ssl:/etc/nginx/ssl
+      - ./ssl:/etc/letsencrypt/live/taruma.0001/
     restart: always
     networks:
       - app-tier
