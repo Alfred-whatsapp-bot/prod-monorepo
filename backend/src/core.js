@@ -15,7 +15,7 @@ import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
-const forceSSL = require('express-force-ssl');
+const forceSSL = require("express-force-ssl");
 
 /**
  * Create a chatbot http Qr login
@@ -36,12 +36,9 @@ export async function httpCtrl(name, port) {
   // const __filename = fileURLToPath(import.meta.url);
   // const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
-  // app.use("/index", function (req, res) {
-  //   //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
-  //   const buffer = fs.readFileSync(path.join(__dirname, "dist/frontend/index.html"));
-  //   let html = buffer.toString();
-  //   res.sendFile(html);
-  // });
+  app.use("/", function (req, res) {
+    res.status(500).send("App is running.");
+  });
   app.listen(port, () => {
     console.log(
       `[${name}] Http chatbot control running on http://localhost:${port}/`
