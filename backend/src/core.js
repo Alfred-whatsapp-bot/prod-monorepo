@@ -33,15 +33,15 @@ export async function httpCtrl(name, port) {
   //   fs.writeFileSync("logs/logs.log", "");
   //   fs.writeFileSync("logs/conversations.log", "");
   // }
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  app.use(express.static(path.join(__dirname, "dist/frontend")));
-  app.use("/index", function (req, res) {
-    //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
-    const buffer = fs.readFileSync(path.join(__dirname, "dist/frontend/index.html"));
-    let html = buffer.toString();
-    res.sendFile(html);
-  });
+  // const __filename = fileURLToPath(import.meta.url);
+  // const __dirname = path.dirname(__filename);
+  // app.use(express.static(path.join(__dirname, "dist/frontend")));
+  // app.use("/index", function (req, res) {
+  //   //res.sendFile(path.join(__dirname, "dist/frontend/index.html"));
+  //   const buffer = fs.readFileSync(path.join(__dirname, "dist/frontend/index.html"));
+  //   let html = buffer.toString();
+  //   res.sendFile(html);
+  // });
   app.listen(port, () => {
     console.log(
       `[${name}] Http chatbot control running on http://localhost:${port}/`
