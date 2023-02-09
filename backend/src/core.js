@@ -36,13 +36,8 @@ export async function httpCtrl(name, port) {
   // const __filename = fileURLToPath(import.meta.url);
   // const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
-  app.use("/", function (req, res) {
-    res.status(500).send("App is running.");
-  });
-  app.listen(port, () => {
-    console.log(
-      `[${name}] Http chatbot control running on http://localhost:${port}/`
-    );
+  app.use("/index", function (req, res) {
+    res.status(200).send("App is running.");
   });
   const authenticate = async (req, res, next) => {
     let authorized = false;
@@ -292,5 +287,10 @@ export async function httpCtrl(name, port) {
   });
   app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");
+  });
+  app.listen(port, () => {
+    console.log(
+      `[${name}] Http chatbot control running on http://localhost:${port}/`
+    );
   });
 }
