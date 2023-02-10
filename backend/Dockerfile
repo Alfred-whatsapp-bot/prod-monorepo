@@ -19,5 +19,4 @@ COPY ./init /docker-entrypoint-initdb.d
 CMD pm2-runtime start src/httpCtrl.js \
     --node-args='--es-module-specifier-resolution=node' \
     --name alfred-bot-new 
-
-    EXPOSE 3001
+EXPOSE 3001
