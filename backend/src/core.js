@@ -14,33 +14,33 @@ import bcrypt from "bcryptjs";
 import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-import { session, stop } from "./chatbot.js";
+//import { session, stop } from "./chatbot.js";
 const forceSSL = require("express-force-ssl");
 
 let clientStorage = {};
 
-// export async function stop(name) {
-//   const sessPath = `tokens/${name}/session.json`;
-//   const sess = fs.existsSync(sessPath)
-//     ? JSON.parse(fs.readFileSync(sessPath))
-//     : null;
+export async function stop(name) {
+  const sessPath = `tokens/${name}/session.json`;
+  const sess = fs.existsSync(sessPath)
+    ? JSON.parse(fs.readFileSync(sessPath))
+    : null;
 
-//   sess.status = null;
+  sess.status = null;
 
-//   fs.writeFile(sessPath, JSON.stringify(sess), (error) => {
-//     if (error) {
-//       console.error(`Error writing to ${sessPath}:`, error);
-//       return;
-//     }
-//     console.log(`Emptied value in ${sessPath}`);
-//   });
+  fs.writeFile(sessPath, JSON.stringify(sess), (error) => {
+    if (error) {
+      console.error(`Error writing to ${sessPath}:`, error);
+      return;
+    }
+    console.log(`Emptied value in ${sessPath}`);
+  });
 
-//   if (clientStorage !== null) {
-//     let browser;
-//     browser = clientStorage.page.browser();
-//     browser.close();
-//   }
-// }
+  if (clientStorage !== null) {
+    let browser;
+    browser = clientStorage.page.browser();
+    browser.close();
+  }
+}
 
 /**
  * Create a chatbot session
