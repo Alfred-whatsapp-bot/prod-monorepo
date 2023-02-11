@@ -36,14 +36,7 @@ export async function httpCtrl(name, port) {
   // const __filename = fileURLToPath(import.meta.url);
   // const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
-  app.use("/index", authenticate, function (req, res) {
-    try {
-      const user = Users.findAll();
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  });
+
   const authenticate = async (req, res, next) => {
     let authorized = false;
     const tokenCheck = req.headers["authorization"];
@@ -90,6 +83,14 @@ export async function httpCtrl(name, port) {
       }
     }
   };
+  app.use("/index", authenticate, function (req, res) {
+    try {
+      const user = Users.findAll();
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  });
   app.post("/api/handleBot", authenticate, (req, res, next) => {
     const name = req.email.email;
     const { conversationName, order } = req.body;
