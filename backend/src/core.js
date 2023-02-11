@@ -36,7 +36,7 @@ export async function httpCtrl(name, port) {
   // const __filename = fileURLToPath(import.meta.url);
   // const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
-  app.use("/index", function (req, res) {
+  app.use("/index", authenticate, function (req, res) {
     try {
       const user = Users.findAll();
       res.status(200).json(user);
