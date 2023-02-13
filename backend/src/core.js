@@ -43,44 +43,37 @@ export async function httpCtrl(name, port) {
     const { email, senha } = req.body;
 
     if (tokenCheck) {
-      try {
-        const authToken = tokenCheck.split(" ")[1];
-        const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
-        if (decoded) {
-          authorized = true;
-          req.email = decoded;
-          //res.status(200).json(decoded.email);
-          next();
-          return authorized;
-        }
-      } catch (error) {
-        res.status(403).send(error);
+      const authToken = tokenCheck.split(" ")[1];
+      const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
+      if (decoded) {
+        authorized = true;
+        req.email = decoded;
+        //res.status(200).json(decoded.email);
+        next();
+        return authorized;
       }
-    }
-
-    if (email && senha && !authorized) {
-      try {
-        const user = await Users.findOne({ where: { email: email } });
-        if (user && (await bcrypt.compare(senha, user.senha))) {
-          // Create token
-          const token = jwt.sign(
-            { user_id: user._id, email },
-            process.env.TOKEN_KEY,
-            {
-              expiresIn: "7 days",
-            }
-          );
-          // save user token in database
-          user.token = token;
-          await user.save();
-          // user
-          res.status(200).json(user);
-          authorized = true;
-          return authorized;
-        }
-      } catch (e) {
-        res.status(500).send(e);
+    } else if (email && senha && !tokenCheck) {
+      const user = await Users.findOne({ where: { email: email } });
+      if (user && (await bcrypt.compare(senha, user.senha))) {
+        // Create token
+        const token = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "7 days",
+          }
+        );
+        // save user token in database
+        user.token = token;
+        await user.save();
+        // user
+        res.status(200).json(user);
+        authorized = true;
+        return authorized;
       }
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
+      return authorized;
     }
   };
   app.use("/index", authenticate, function (req, res) {
