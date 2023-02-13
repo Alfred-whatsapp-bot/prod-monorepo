@@ -58,7 +58,7 @@ export async function httpCtrl(name, port) {
       }
     }
 
-    if (email && senha) {
+    if (email && senha && !authorized) {
       try {
         const user = await Users.findOne({ where: { email: email } });
         if (user && (await bcrypt.compare(senha, user.senha))) {
@@ -91,7 +91,7 @@ export async function httpCtrl(name, port) {
       res.status(500).json(error);
     }
   });
-  app.post("/api/handleBot",  (req, res, next) => {
+  app.post("/api/handleBot", authenticate, (req, res, next) => {
     const name = req.email.email;
     const { conversationName, order } = req.body;
     if (order == "stop") {
@@ -123,7 +123,7 @@ export async function httpCtrl(name, port) {
       }
     );
   });
-  app.get("/api/data",  (req, res, next) => {
+  app.get("/api/data", authenticate, (req, res, next) => {
     //authorize(req, res);
     const name = req.email.email;
     const infoPath = `tokens/${name}/info.json`;
@@ -155,7 +155,7 @@ export async function httpCtrl(name, port) {
       conversation: flow,
     });
   });
-  app.get("/api/connection",  async (req, res, next) => {
+  app.get("/api/connection", async (req, res, next) => {
     //authorize(req, res);
     const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
@@ -234,7 +234,7 @@ export async function httpCtrl(name, port) {
       res.json(pedidos);
     });
   });
-  app.post("/api/pedidos/create", (req, res, next) => {
+  app.post("/api/pedidos/create", authenticate, (req, res, next) => {
     //authorize(req, res);
     const pedido = req.body;
     try {
@@ -245,7 +245,7 @@ export async function httpCtrl(name, port) {
       res.status(500).json({ error: error.message });
     }
   });
-  app.post("/api/register", async (req, res) => {
+  app.post("/api/register", authenticate, async (req, res) => {
     // Our register logic starts here
     try {
       const { nome, email, senha } = req.body;
@@ -291,7 +291,7 @@ export async function httpCtrl(name, port) {
     }
     // Our register logic ends here
   });
-  app.post("/api/login",  (req, res) => {
+  app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");
   });
   app.listen(port, () => {
