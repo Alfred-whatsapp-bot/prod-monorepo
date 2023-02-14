@@ -39,43 +39,62 @@ export async function httpCtrl(name, port) {
 
   const authenticate = async (req, res, next) => {
     let authorized = false;
-    const tokenCheck = req.headers["authorization"];
     const { email, senha } = req.body;
 
-    if (tokenCheck) {
+    tokenCheck(req).then((result) => {
+      if (result) {
+        authorized = true;
+        next();
+        return authorized;
+      } else if (email && senha) {
+        Users.findOne({ where: { email: email } }).then((user) => {
+          if (user && bcrypt.compare(senha, user.senha)) {
+            // Create token
+            const token = jwt.sign(
+              { user_id: user._id, email },
+              process.env.TOKEN_KEY,
+              {
+                expiresIn: "7 days",
+              }
+            );
+            // save user token in database
+            user.token = token;
+            user.save();
+            // user
+            let ret = {
+              user: user,
+              token: token,
+            };
+            res.status(200).json(ret);
+            authorized = true;
+            return authorized;
+          }
+        });
+      }
+    });
+    if (!authorized) {
+      res.status(401).send("Not authorized");
+    }
+  };
+
+  const tokenCheck = async (req) => {
+    const tokenCheck = req.headers["authorization"];
+    let isValid = false;
+
+    try {
       const authToken = tokenCheck.split(" ")[1];
       const decoded = jwt.verify(authToken, process.env.TOKEN_KEY);
       if (decoded) {
-        authorized = true;
         req.email = decoded;
-        //res.status(200).json(decoded.email);
+        isValid = true;
         next();
-        return authorized;
+        return isValid;
       }
-    } else if (email && senha && !tokenCheck) {
-      const user = await Users.findOne({ where: { email: email } });
-      if (user && (await bcrypt.compare(senha, user.senha))) {
-        // Create token
-        const token = jwt.sign(
-          { user_id: user._id, email },
-          process.env.TOKEN_KEY,
-          {
-            expiresIn: "7 days",
-          }
-        );
-        // save user token in database
-        user.token = token;
-        await user.save();
-        // user
-        res.status(200).json(user);
-        authorized = true;
-        return authorized;
-      }
-    } else {
-      res.status(401).json({ message: "Unauthorized" });
-      return authorized;
+    } catch (error) {
+      return isValid;
     }
   };
+
   app.use("/index", authenticate, function (req, res) {
     try {
       const user = Users.findAll();
