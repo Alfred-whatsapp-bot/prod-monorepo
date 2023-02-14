@@ -70,11 +70,11 @@ export async function httpCtrl(name, port) {
             return authorized;
           }
         });
+      } else {
+        res.status(401).send("Unauthorized");
+        return authorized;
       }
     });
-    if (!authorized) {
-      res.status(401).send("Not authorized");
-    }
   };
 
   const tokenCheck = async (req) => {
