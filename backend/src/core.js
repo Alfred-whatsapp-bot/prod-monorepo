@@ -33,8 +33,8 @@ export async function httpCtrl(name, port) {
   //   fs.writeFileSync("logs/logs.log", "");
   //   fs.writeFileSync("logs/conversations.log", "");
   // }
-  // const __filename = fileURLToPath(import.meta.url);
-  // const __dirname = path.dirname(__filename);
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
 
   const authenticate = async (req, res, next) => {
