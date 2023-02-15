@@ -64,6 +64,7 @@ export async function httpCtrl(name, port) {
             let ret = {
               user: user,
               token: token,
+              email: email,
             };
             res.status(200).json(ret);
             authorized = true;
