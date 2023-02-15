@@ -168,7 +168,7 @@ export async function httpCtrl(name, port) {
       conversation: flow,
     });
   });
-  app.get("/api/connection", async (req, res, next) => {
+  app.get("/api/connection", authenticate, async (req, res, next) => {
     //authorize(req, res);
     const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
