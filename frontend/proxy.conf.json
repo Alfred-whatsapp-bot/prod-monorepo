@@ -1,0 +1,6 @@
+{
+    "/api": {
+      "target": "https://alfredbot.shop",
+      "secure": false
+    }
+  }
