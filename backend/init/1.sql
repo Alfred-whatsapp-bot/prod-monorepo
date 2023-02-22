@@ -38,7 +38,7 @@ USE `alfred_bot`;
 DROP TABLE IF EXISTS `botao`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `botao` (
   `botao_id` int NOT NULL AUTO_INCREMENT,
@@ -63,7 +63,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `cliente`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `cliente` (
   `nome` varchar(200) DEFAULT NULL,
@@ -92,7 +92,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `mensagem`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `mensagem` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -120,7 +120,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `menu`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `menu` (
   `menu_id` int NOT NULL AUTO_INCREMENT,
@@ -146,7 +146,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `produtos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `produtos` (
   `produto_id` int NOT NULL AUTO_INCREMENT,
@@ -680,7 +680,7 @@ UNLOCK TABLES;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `uploads`;
 CREATE TABLE `uploads` (
-  `uploads_id` int NOT NULL AUTO_INCREMENT,
+  `upload_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `content` varchar(255) NOT NULL,
