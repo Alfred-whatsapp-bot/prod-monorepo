@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
 const forceSSL = require("express-force-ssl");
 import multer from "multer";
-import { zlib } from "zlib";
+import zlib  from "zlib";
 
 /**
  * Create a chatbot http Qr login
