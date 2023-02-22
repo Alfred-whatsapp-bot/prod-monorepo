@@ -51,6 +51,7 @@ services:
       DB_PASSWORD: cgbreg1719=
       DB_HOST: '89.117.32.179'
       DB_PORT: "3306"
+      TOKEN_KEY: '86669f92-84fd-4ad2-82d6-42635438f723'
     networks:
       - app-tier
 
