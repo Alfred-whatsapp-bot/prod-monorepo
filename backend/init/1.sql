@@ -678,6 +678,10 @@ VALUES (0, 'xomano', 'email@mail.com', '1234', '');
 ;
 UNLOCK TABLES;
 UNLOCK TABLES;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 DROP TABLE IF EXISTS `uploads`;
 CREATE TABLE `uploads` (
   `upload_id` int NOT NULL AUTO_INCREMENT,
@@ -685,8 +689,8 @@ CREATE TABLE `uploads` (
   `type` varchar(255) NOT NULL,
   `content` varchar(255) NOT NULL,
   `session` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`uploads_id`),
-  UNIQUE KEY `uploads_id_UNIQUE` (`uploads_id`)
+  PRIMARY KEY (`upload_id`),
+  UNIQUE KEY `upload_id_UNIQUE` (`upload_id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 LOCK TABLES `uploads` WRITE;
 ;

@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
 const forceSSL = require("express-force-ssl");
 import multer from "multer";
-import zlib  from "zlib";
+import zlib from "zlib";
 
 /**
  * Create a chatbot http Qr login
@@ -255,20 +255,22 @@ export async function httpCtrl(name, port) {
     const fileId = req.params.id;
 
     // Retrieve the file data from the database
-    pool.query(
-      "SELECT name, type, content FROM files WHERE id = ?",
-      [fileId],
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          res.sendStatus(500);
-        } else {
-          // Set the content type header and send the file data to the client
-          res.setHeader("Content-Type", result[0].type);
-          res.send(result[0].content);
-        }
-      }
-    );
+    Uploads.findByPk(fileId)
+      .then((file) => {
+        // Decompress the file data
+        zlib.gunzip(file.content, (err, data) => {
+          if (err) {
+            console.error(err);
+            res.sendStatus(500).json(err);
+          } else {
+            // Send the file data to the browser
+            res.send(data);
+          }
+        });
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
   });
   app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");
