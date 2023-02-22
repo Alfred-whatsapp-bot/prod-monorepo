@@ -28,7 +28,7 @@
 CREATE DATABASE
 /*!32312 IF NOT EXISTS*/
 `alfred_bot`
-/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
+/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */
 /*!80016 DEFAULT ENCRYPTION='N' */
 ;
 USE `alfred_bot`;
@@ -45,7 +45,7 @@ CREATE TABLE `botao` (
   `buttonText` varchar(500) DEFAULT NULL,
   `displayText` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`botao_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -72,7 +72,7 @@ CREATE TABLE `cliente` (
   `endereco` varchar(200) DEFAULT NULL,
   `cliente_id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`cliente_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 11 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -100,7 +100,7 @@ CREATE TABLE `mensagem` (
   `texto` varchar(2000) DEFAULT NULL,
   `ativo` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -128,7 +128,7 @@ CREATE TABLE `menu` (
   `rowTitle` varchar(500) DEFAULT NULL,
   `rowDescription` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`menu_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -157,7 +157,7 @@ CREATE TABLE `produtos` (
   `descricao` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`produto_id`),
   UNIQUE KEY `produto_id_UNIQUE` (`produto_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 80 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 80 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -622,7 +622,7 @@ CREATE TABLE `messages` (
   `session` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`message_id`),
   UNIQUE KEY `message_id_UNIQUE` (`message_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -670,10 +670,24 @@ CREATE TABLE `user` (
   `token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id_UNIQUE` (`user_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 LOCK TABLES `user` WRITE;
 ;
 INSERT INTO `user`
-VALUES (0, 'xomano','email@mail.com', '1234', '');
+VALUES (0, 'xomano', 'email@mail.com', '1234', '');
+;
+UNLOCK TABLES;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `uploads`;
+CREATE TABLE `uploads` (
+  `uploads_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `type` varchar(255) NOT NULL,
+  `content` varchar(255) NOT NULL,
+  `session` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`uploads_id`),
+  UNIQUE KEY `uploads_id_UNIQUE` (`uploads_id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+LOCK TABLES `uploads` WRITE;
 ;
 UNLOCK TABLES;
