@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
 const forceSSL = require("express-force-ssl");
 import multer from "multer";
-import zlib  from "zlib";
+import zlib from "zlib";
 
 /**
  * Create a chatbot http Qr login
@@ -98,7 +98,7 @@ export async function httpCtrl(name, port) {
     }
   });
   app.post("/api/handleBot", authenticate, (req, res, next) => {
-    const name = req.email.email;
+    const name = req.email;
     const { conversationName, order } = req.body;
     if (order == "stop") {
       stop(name);
@@ -130,7 +130,7 @@ export async function httpCtrl(name, port) {
     );
   });
   app.get("/api/data", authenticate, (req, res, next) => {
-    const name = req.email.email;
+    const name = req.email;
     const infoPath = `tokens/${name}/info.json`;
     const qrPath = `tokens/${name}/qr.json`;
     const sessPath = `tokens/${name}/session.json`;
@@ -161,7 +161,7 @@ export async function httpCtrl(name, port) {
     });
   });
   app.get("/api/connection", authenticate, async (req, res, next) => {
-    const name = req.email.email;
+    const name = req.email;
     const connectionPath = `tokens/${name}/connection.json`;
     const connection = fs.existsSync(connectionPath)
       ? JSON.parse(fs.readFileSync(connectionPath))
@@ -240,7 +240,7 @@ export async function httpCtrl(name, port) {
             name: req.file.originalname,
             type: req.file.mimetype,
             content: compressedData,
-            session: req.email.email,
+            session: req.email,
           });
         }
         res.send("File uploaded successfully");
