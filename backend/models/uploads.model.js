@@ -42,7 +42,7 @@ const sequelize = new Sequelize(
 export const Uploads = sequelize.define(
   "uploads",
   {
-    upload_id: {
+    uploads_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
