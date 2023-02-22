@@ -257,16 +257,21 @@ export async function httpCtrl(name, port) {
     // Retrieve the file data from the database
     Uploads.findByPk(fileId)
       .then((file) => {
-        // Decompress the file data
-        zlib.gunzip(file.content, (err, data) => {
-          if (err) {
-            console.error(err);
-            res.sendStatus(500).json(err);
-          } else {
-            // Send the file data to the browser
-            res.send(data);
-          }
-        });
+        if (!file) {
+          res.status(404).send("File not found");
+        } else {
+          // Decompress the file data
+          zlib.gunzip(file.content, (err, data) => {
+            if (err) {
+              console.log(err);
+              res.sendStatus(500).json(err);
+            } else {
+              // Send the file data to the browser
+              console.log(data);
+              res.send(data);
+            }
+          });
+        }
       })
       .catch((error) => {
         res.status(500).json(error);
