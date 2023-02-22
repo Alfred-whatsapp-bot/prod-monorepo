@@ -55,7 +55,7 @@ export async function httpCtrl(name, port) {
             user.save();
             // user
             let ret = {
-              user: user,
+              user: user.nome,
               token: token,
               email: email,
             };
