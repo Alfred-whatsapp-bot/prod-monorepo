@@ -89,7 +89,8 @@
               "browserTarget": "frontend:build:production"
             },
             "development": {
-              "browserTarget": "frontend:build:development"
+              "browserTarget": "frontend:build:development",
+              "disableHostCheck": true
             }
           },
           "defaultConfiguration": "development"
