@@ -1,21 +1,20 @@
-import venom from "venom-bot";
-import { venomOptions } from "./config";
 import express from "express";
 import fs from "fs";
 import { exec } from "child_process";
-import mime from "mime-types";
-import { getPedidos, createPedido } from "../repositories/pedidoRepository";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import { Users } from "../models/user.model.js";
+import { Uploads } from "../models/uploads.model.js";
 import bcrypt from "bcryptjs";
 import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 import { session, stop } from "./chatbot.js";
 const forceSSL = require("express-force-ssl");
+import multer from "multer";
+import zlib from "zlib";
 
 /**
  * Create a chatbot http Qr login
@@ -24,15 +23,9 @@ const forceSSL = require("express-force-ssl");
  */
 export async function httpCtrl(name, port) {
   const app = express();
+  const upload = multer({ dest: "uploads/" });
   app.use(cors());
   app.use(bodyParser.json()); // support json encoded bodies
-  // app.use(forceSSL);
-  //app.enable("trust proxy");
-  // if (!fs.existsSync("logs")) {
-  //   fs.mkdirSync("logs", { recursive: true });
-  //   fs.writeFileSync("logs/logs.log", "");
-  //   fs.writeFileSync("logs/conversations.log", "");
-  // }
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
@@ -62,7 +55,7 @@ export async function httpCtrl(name, port) {
             user.save();
             // user
             let ret = {
-              user: user,
+              user: user.nome,
               token: token,
               email: email,
             };
@@ -137,7 +130,6 @@ export async function httpCtrl(name, port) {
     );
   });
   app.get("/api/data", authenticate, (req, res, next) => {
-    //authorize(req, res);
     const name = req.email.email;
     const infoPath = `tokens/${name}/info.json`;
     const qrPath = `tokens/${name}/qr.json`;
@@ -169,7 +161,6 @@ export async function httpCtrl(name, port) {
     });
   });
   app.get("/api/connection", authenticate, async (req, res, next) => {
-    //authorize(req, res);
     const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
     const connection = fs.existsSync(connectionPath)
@@ -177,60 +168,7 @@ export async function httpCtrl(name, port) {
       : null;
     res.json({ status: connection?.status });
   });
-  app.get("/api/controls/start", (req, res, next) => {
-    //authorize(req, res);
-    exec("npm run start", (err, stdout, stderr) => {
-      if (err) {
-        res.json({ status: "ERROR" });
-        console.error(err);
-        return;
-      }
-      res.json({ status: "OK" });
-      console.log(stdout);
-      log("Start", `Start chatbot...`);
-    });
-  });
-  app.get("/api/controls/stop", (req, res, next) => {
-    authorize(req, res);
-    exec("npm run stop", (err, stdout, stderr) => {
-      if (err) {
-        res.json({ status: "ERROR" });
-        console.error(err);
-        return;
-      }
-      res.json({ status: "OK" });
-      console.log(stdout);
-      log("Stop", `Stop chatbot...`);
-    });
-  });
-  app.get("/api/controls/reload", (req, res, next) => {
-    //authorize(req, res);
-    exec("npm run reload", (err, stdout, stderr) => {
-      if (err) {
-        res.json({ status: "ERROR" });
-        console.error(err);
-        return;
-      }
-      res.json({ status: "OK" });
-      console.log(stdout);
-      log("Reload", `Reload chatbot...`);
-    });
-  });
-  app.get("/api/controls/restart", (req, res, next) => {
-    //authorize(req, res);
-    exec("npm run restart", (err, stdout, stderr) => {
-      if (err) {
-        res.json({ status: "ERROR" });
-        console.error(err);
-        return;
-      }
-      res.json({ status: "OK" });
-      console.log(stdout);
-      log("Restart", `Restart chatbot...`);
-    });
-  });
   app.get("/api/controls/log/clear", (req, res, next) => {
-    //authorize(req, res);
     exec("> logs/logs.log", (err, stdout, stderr) => {
       if (err) {
         res.json({ status: "ERROR" });
@@ -240,23 +178,6 @@ export async function httpCtrl(name, port) {
       res.json({ status: "OK" });
       console.log(stdout);
     });
-  });
-  app.get("/api/pedidos", (req, res, next) => {
-    //authorize(req, res);
-    getPedidos().then((pedidos) => {
-      res.json(pedidos);
-    });
-  });
-  app.post("/api/pedidos/create", authenticate, (req, res, next) => {
-    //authorize(req, res);
-    const pedido = req.body;
-    try {
-      createPedido(pedido).then((pedido) => {
-        res.json(pedido);
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
   });
   app.post("/api/register", authenticate, async (req, res) => {
     // Our register logic starts here
@@ -303,6 +224,58 @@ export async function httpCtrl(name, port) {
       res.sendStatus(403).json(err);
     }
     // Our register logic ends here
+  });
+  // Define a route for handling file uploads
+  app.post("/api/upload", authenticate, upload.single("file"), (req, res) => {
+    try {
+      // Retrieve the file contents from the request
+      const fileContent = req.file.buffer;
+      zlib.gzip(fileContent, (err, compressedData) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(500).json(err);
+        } else {
+          // Insert the file data into the database
+          Uploads.create({
+            name: req.file.originalname,
+            type: req.file.mimetype,
+            content: compressedData,
+            session: req.email.email,
+          });
+        }
+        res.send("File uploaded successfully");
+      });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  });
+
+  // Define a route for retrieving files from the database
+  app.get("/api/file/:id", authenticate, (req, res) => {
+    const fileId = req.params.id;
+
+    // Retrieve the file data from the database
+    Uploads.findByPk(fileId)
+      .then((file) => {
+        if (!file) {
+          res.status(404).send("File not found");
+        } else {
+          // Decompress the file data
+          zlib.gunzip(file.content, (err, data) => {
+            if (err) {
+              console.log(err);
+              res.sendStatus(500).json(err);
+            } else {
+              // Send the file data to the browser
+              console.log(data);
+              res.send(data);
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
   });
   app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");

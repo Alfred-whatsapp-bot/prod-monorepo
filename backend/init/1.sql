@@ -28,7 +28,7 @@
 CREATE DATABASE
 /*!32312 IF NOT EXISTS*/
 `alfred_bot`
-/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
+/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */
 /*!80016 DEFAULT ENCRYPTION='N' */
 ;
 USE `alfred_bot`;
@@ -38,14 +38,14 @@ USE `alfred_bot`;
 DROP TABLE IF EXISTS `botao`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `botao` (
   `botao_id` int NOT NULL AUTO_INCREMENT,
   `buttonText` varchar(500) DEFAULT NULL,
   `displayText` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`botao_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -63,7 +63,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `cliente`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `cliente` (
   `nome` varchar(200) DEFAULT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE `cliente` (
   `endereco` varchar(200) DEFAULT NULL,
   `cliente_id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`cliente_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 11 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -92,7 +92,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `mensagem`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `mensagem` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -100,7 +100,7 @@ CREATE TABLE `mensagem` (
   `texto` varchar(2000) DEFAULT NULL,
   `ativo` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -120,7 +120,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `menu`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `menu` (
   `menu_id` int NOT NULL AUTO_INCREMENT,
@@ -128,7 +128,7 @@ CREATE TABLE `menu` (
   `rowTitle` varchar(500) DEFAULT NULL,
   `rowDescription` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`menu_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -146,7 +146,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `produtos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */
 ;
-/*!40101 SET character_set_client = utf8 */
+/*!40101 SET character_set_client = utf8mb4 */
 ;
 CREATE TABLE `produtos` (
   `produto_id` int NOT NULL AUTO_INCREMENT,
@@ -157,7 +157,7 @@ CREATE TABLE `produtos` (
   `descricao` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`produto_id`),
   UNIQUE KEY `produto_id_UNIQUE` (`produto_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 80 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 80 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -622,7 +622,7 @@ CREATE TABLE `messages` (
   `session` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`message_id`),
   UNIQUE KEY `message_id_UNIQUE` (`message_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */
 ;
 --
@@ -670,10 +670,28 @@ CREATE TABLE `user` (
   `token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id_UNIQUE` (`user_id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 LOCK TABLES `user` WRITE;
 ;
 INSERT INTO `user`
-VALUES (0, 'xomano','email@mail.com', '1234', '');
+VALUES (0, 'xomano', 'email@mail.com', '1234', '');
+;
+UNLOCK TABLES;
+UNLOCK TABLES;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
+DROP TABLE IF EXISTS `uploads`;
+CREATE TABLE `uploads` (
+  `upload_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `type` varchar(255) NOT NULL,
+  `content` varchar(255) NOT NULL,
+  `session` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`upload_id`),
+  UNIQUE KEY `upload_id_UNIQUE` (`upload_id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+LOCK TABLES `uploads` WRITE;
 ;
 UNLOCK TABLES;
