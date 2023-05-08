@@ -1,5 +1,5 @@
 import venom from "venom-bot";
-import { venomOptions } from "./config";
+import { venomOptions } from "./config.js";
 import fs from "fs";
 import { createRequire } from "module";
 import mime from "mime-types";

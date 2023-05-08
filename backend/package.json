@@ -4,7 +4,7 @@
   "description": "WhatsApp Chatbot",
   "type": "module",
   "scripts": {
-    "dev": "node --es-module-specifier-resolution=node src/main.js",
+    "dev": "node src/httpCtrl.js",
     "dev:detach": "node --es-module-specifier-resolution=node src/main.js >> logs/console.log 2>&1 &",
     "log:dev": "tail -f logs/console.log",
     "http-ctrl:dev": "node --es-module-specifier-resolution=node src/httpCtrl.js",
