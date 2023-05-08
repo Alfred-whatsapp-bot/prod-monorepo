@@ -75,4 +75,8 @@ export class ApiConnectionService {
       this.httpOptions
     );
   }
+
+  getMessages() {
+    return this.http.get<any>(`${this.baseUrl}/api/getmessages`, this.httpOptions);
+  }
 }

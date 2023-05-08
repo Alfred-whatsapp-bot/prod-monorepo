@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Editar</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Mensagem</mat-label>
+    <input matInput [(ngModel)]="data.text" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Id</mat-label>
+    <input matInput type="number" [(ngModel)]="data.messageId" />
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button
+    mat-raised-button
+    color="accent"
+    (click)="onSaveClick()"
+    [ngStyle]="{ color: '#fff' }"
+  >
+    Salvar
+  </button>
+</div>

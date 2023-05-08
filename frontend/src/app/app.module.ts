@@ -42,6 +42,8 @@ import { PortalModule } from "@angular/cdk/portal";
 import { UserProfileComponent } from "./pages/perfil/user-profile.component";
 import { TableListComponent } from "./pages/produtos/table-list.component";
 import { DashboardComponent } from "./pages/dashboard/dashboard.component";
+import { ModalComponent } from "./components/modal/modal.component";
+import { MatDialogModule } from "@angular/material/dialog";
 
 @NgModule({
   imports: [
@@ -85,6 +87,8 @@ import { DashboardComponent } from "./pages/dashboard/dashboard.component";
     MatTooltipModule,
     MatFormFieldModule,
     MatIconModule,
+    MatIconModule,
+    MatDialogModule,
   ],
   declarations: [
     AppComponent,
@@ -93,6 +97,7 @@ import { DashboardComponent } from "./pages/dashboard/dashboard.component";
     UserProfileComponent,
     TableListComponent,
     DashboardComponent,
+    ModalComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

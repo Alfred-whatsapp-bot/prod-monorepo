@@ -6,6 +6,7 @@ import { Routes, RouterModule } from "@angular/router";
 import { AdminLayoutComponent } from "./layouts/admin-layout/admin-layout.component";
 import { LoginComponent } from "./shared/login/login.component";
 import { AuthGuard } from "./auth/auth.guard";
+import { TableListComponent } from "./pages/produtos/table-list.component";
 
 const routes: Routes = [
   { path: "", redirectTo: "home", pathMatch: "full", canActivate: [AuthGuard] },
