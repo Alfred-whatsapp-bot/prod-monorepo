@@ -22,6 +22,18 @@ export function sendEmail(options) {
     to: "luisoisoiso@gmail.com", // receiver (use array of string for a list)
     subject: options.subject, // Subject line
     html: getEmail(options.params), // plain text body
+    attachments: [
+    {
+      filename: 'arquivo.pdf',
+      path: '/path/to/arquivo.pdf',
+      contentDisposition: 'attachment',
+      inline: false
+    },
+    {
+      filename: 'link.txt',
+      content: 'https://www.example.com/arquivo.pdf',
+      contentDisposition: 'inline'
+    }]
   };
 
   transporter.sendMail(mailOptions, function (err, info) {
