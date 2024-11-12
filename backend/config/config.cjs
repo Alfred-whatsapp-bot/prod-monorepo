@@ -6,7 +6,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     port: process.env.DATABASE_PORT,
-    dialect: "mysql",
+    dialect: "postgres",
     logging: true,
   },
   test: {
@@ -15,7 +15,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     port: process.env.DATABASE_PORT,
-    dialect: "mysql",
+    dialect: "postgres",
     logging: true,
   },
   production: {
@@ -24,7 +24,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     port: process.env.DATABASE_PORT,
-    dialect: "mysql",
+    dialect: "postgres",
     logging: true,
   },
 };

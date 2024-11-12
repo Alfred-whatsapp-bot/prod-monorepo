@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuarios {
+  id    Int     @id @default(autoincrement())
+  nome  String
+  email String? @unique
+  senha String
+  token String?
+}
+
+model Message {
+  message_id  Int       @id @default(autoincrement())
+  parent_id   Int?
+  pattern     String?
+  text        String?
+  description String?
+  buttons     String?
+  link        String?
+  audio       String?
+  image       String?
+  end         Boolean?
+  session     String?
+  parent      Message?  @relation("MessageToMessage", fields: [parent_id], references: [message_id])
+  children    Message[] @relation("MessageToMessage")
+}
+
+model Contatos {
+  id               Int     @id @default(autoincrement())
+  telefone         String
+  aluno_nome       String
+  avaliacao_nome   String?
+  nota             Float?
+  session          String
+  materia_nome     String?
+  turma_nome       String?
+  responsavel_nome String?
+}
+
+model LogEnvio {
+  id        Int      @id @default(autoincrement())
+  dataEnvio DateTime @default(now())
+  status    String
+  telefone  String
+  descricao String?
+}

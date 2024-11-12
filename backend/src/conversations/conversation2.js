@@ -10,11 +10,6 @@ export default [
     parent: 0,
     pattern: /.*/,
     message: "Olá! Sou o Alfred 2🤖.",
-    description: "Como posso te ajudar?",
-    buttons: buttons([
-      "Site",
-      "Deixe uma menssagem",
-    ]),
   },
   {
     id: 2,

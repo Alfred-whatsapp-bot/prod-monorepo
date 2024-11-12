@@ -19,12 +19,9 @@ export class PaginaInicialComponent implements OnInit, OnDestroy {
   intervalConnection: any;
   connection: string = "DISCONNECTED";
   subscription: Subscription;
+  loading: boolean = false;
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private apiConnectionSrv: ApiConnectionService,
-    private router: Router
-  ) {
+  constructor(private sanitizer: DomSanitizer, private apiConnectionSrv: ApiConnectionService, private router: Router) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.routePath = event.url;
@@ -43,14 +40,12 @@ export class PaginaInicialComponent implements OnInit, OnDestroy {
 
     this.subscription = interval(1000).subscribe(() => {
       if (this.connection !== "CONNECTED") {
-        console.log("rodou subscription" + this.qrCode);
         this.getQrCode();
       }
     });
 
     this.intervalConnection = setInterval(() => {
       this.getConnection();
-      console.log(this.status);
     }, 1000);
 
     this.intervalLogs = setInterval(() => {
@@ -59,35 +54,37 @@ export class PaginaInicialComponent implements OnInit, OnDestroy {
         this.getLogs();
         this.getConversation();
       }
-      // else {
-      //   this.getQrCode();
-      // }
     }, 2000);
   }
 
   async getQrCode() {
     this.apiConnectionSrv.getQrCode().subscribe((data) => {
-      this.qrCode = this.sanitizer.bypassSecurityTrustResourceUrl(
-        data.qr.base64Qr
-      );
+      if (data.qr) {
+        this.qrCode = this.sanitizer.bypassSecurityTrustResourceUrl(data.qr.base64Qr);
+        this.loading = false;
+      }
     });
   }
 
   async getStatus() {
     this.apiConnectionSrv.getStatus().subscribe((data) => {
-      this.status = data.session.status;
+      if (data.session) this.status = data.session.status;
     });
   }
 
   async startBot() {
-    this.apiConnectionSrv.startBot().subscribe((data) => {
-      console.log(data);
-    });
+    this.loading = true;
+    this.apiConnectionSrv.startBot().subscribe();
   }
 
   async stopBot() {
     this.apiConnectionSrv.stopBot().subscribe((data) => {
-      console.log(data);
+      window.location.reload();
+    });
+  }
+
+  async restartBot() {
+    this.apiConnectionSrv.restart().subscribe((data) => {
       window.location.reload();
     });
   }
@@ -123,16 +120,11 @@ export class PaginaInicialComponent implements OnInit, OnDestroy {
   }
 
   handleTexts(text: string, idHtml: string) {
-    const getTabSelected = document.querySelector(
-      "div[role='tab'][aria-selected=true] div"
-    ).innerHTML;
+    const getTabSelected = document.querySelector("div[role='tab'][aria-selected=true] div").innerHTML;
     if (getTabSelected.includes(idHtml)) {
       const retHtml = text
         ? text
-            .replace(
-              /\[Receive\]/g,
-              "<span class='bg-warning'>[Recebido]:</span>"
-            )
+            .replace(/\[Receive\]/g, "<span class='bg-warning'>[Recebido]:</span>")
             .replace(/\[Send\]/g, "<span class='bg-warning'>[Enviado]:</span>")
             .replace(/\[Error\]/g, "<span class='red'>[Erro]:</span>")
             .replace(/\[Start\]/g, "<span class='purple'>[Start]:</span>")

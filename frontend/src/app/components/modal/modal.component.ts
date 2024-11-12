@@ -1,9 +1,9 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
-export interface EditDialogData {
+export interface DialogData {
   text: string;
-  messageId: number;
+  showConfirm: boolean;
 }
 
 @Component({
@@ -12,10 +12,7 @@ export interface EditDialogData {
   styleUrls: ["./modal.component.css"],
 })
 export class ModalComponent implements OnInit {
-  constructor(
-    public dialogRef: MatDialogRef<ModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: EditDialogData
-  ) {}
+  constructor(public dialogRef: MatDialogRef<ModalComponent>, @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 
   ngOnInit(): void {}
 

@@ -1,63 +1,54 @@
 <div class="hidden" id="placeholder"></div>
 <div class="main-content">
   <div class="container-fluid">
-    <mat-tab-group animationDuration="2000ms">
+    <mat-tab-group animationDuration="1000ms">
       <mat-tab label="Controles">
         <div id="Controles">
+          <br />
           <div class="btn-group">
-            <div
-              *ngIf="
-                status === null ||
-                  status === undefined ||
-                  status === 'notLogged';
-                else connected
-              "
-            >
-              <div *ngIf="qrCode === null || qrCode === '' || qrCode === undefined">
-                <button
-                  mat-raised-button
-                  type="button"
-                  class="btn btn-danger"
-                  id="start"
-                  (click)="startBot()"
-                >
-                  Começar
-                </button>
+            <div *ngIf="status === null || status === undefined || status === 'notLogged'; else connected">
+              <div *ngIf="!qrCode">
+                <button mat-raised-button type="button" class="btn btn-danger" id="start" (click)="startBot()" id="start">Conectar</button>
               </div>
-              <div *ngIf="qrCode !== null || qrCode !== '' || qrCode !== undefined">
-                <br />
-                <br />
-                <br />
-                <img [src]="qrCode" alt="QR Code" class="img-fluid" />
-                <br />
-                <br />
-                <br />
-                <div class="alert alert-warning" role="alert">
-                  <p>
-                    <strong>Atenção!</strong> Para iniciar o bot, você precisa
-                    escanear o QR Code acima.
-                  </p>
+              <div *ngIf="qrCode" class="qr-container">
+                <ol class="instructions-list">
+                  <li class="instruction-item">
+                    <div class="instruction-content">Abra o WhatsApp no seu celular.</div>
+                  </li>
+                  <li class="instruction-item">
+                    <div class="instruction-content">
+                      Toque em <span class="highlight">Mais opções</span> <span class="icon more-options-icon"></span> no Android ou em <span class="highlight">Configurações</span>
+                      <span class="icon settings-icon"></span> no iPhone
+                    </div>
+                  </li>
+                  <li class="instruction-item">
+                    <div class="instruction-content">Toque em <span class="highlight">Dispositivos conectados</span> e, em seguida, em <span class="highlight">Conectar dispositivo</span>.</div>
+                  </li>
+                  <li class="instruction-item">
+                    <div class="instruction-content">Aponte seu celular para esta tela para escanear o QR code.</div>
+                  </li>
+                  <li class="instruction-item">
+                    <div class="instruction-content">Demorando para carregar o QR Code? Clique <button type="button" class="btn btn-danger" id="start" (click)="restartBot()" id="start">Reiniciar</button></div>
+                  </li>
+                </ol>
+                <div *ngIf="loading" class="spinner-container">
+                  <mat-spinner></mat-spinner>
+                </div>
+                <div *ngIf="!loading">
+                  <img [src]="qrCode" alt="QR Code" class="img-fluid" />
                 </div>
               </div>
             </div>
             <ng-template #connected>
-              <button
-                mat-raised-button
-                type="button"
-                class="btn btn-warning"
-                id="stop"
-                (click)="stopBot()"
-              >
-                Parar
-              </button>
-              <!-- <button
-                mat-raised-button
-                type="submit"
-                class="btn btn-secondary"
-                id="clearLog"
-              >
-                Limpar Log
-              </button> -->
+              <div class="status-card" id="statusCard">
+                <div class="status-header">
+                  <div class="status-indicator">
+                    <div class="status-icon"></div>
+                    <span class="status-text">Conectado com sucesso!</span>
+                  </div>
+                </div>
+                <div><button mat-raised-button type="button" class="btn btn-warning" id="stop" (click)="stopBot()">Desconectar</button></div>
+              </div>
             </ng-template>
           </div>
         </div></mat-tab
@@ -65,5 +56,6 @@
       <mat-tab label="Conversas"><div id="Conversas"></div></mat-tab>
       <mat-tab label="Logs"> <div id="Logs"></div></mat-tab>
     </mat-tab-group>
+    <app-dashboard></app-dashboard>
   </div>
 </div>

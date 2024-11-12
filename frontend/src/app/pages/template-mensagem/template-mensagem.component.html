@@ -1,0 +1,33 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <ng-container *ngIf="loading; else content">
+      <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+      </div>
+    </ng-container>
+    <ng-template #content>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-container">
+            <mat-form-field>
+              <mat-label>Modelo de mensagem</mat-label>
+              <textarea matInput [(ngModel)]="userMessage" [maxlength]="300" cdkTextareaAutosize cdkAutosizeMinRows="15" cdkAutosizeMaxRows="20"></textarea>
+            </mat-form-field>
+            <button mat-raised-button type="button" class="btn btn-danger" id="start" id="alterar">Alterar</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="chat-container">
+            <div class="header">
+              <div class="logo">logo</div>
+              <div class="header-text">INSTITUIÇÃO</div>
+            </div>
+            <div class="chat-content">
+              <div class="message" [innerHTML]="formattedMessage"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

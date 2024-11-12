@@ -1,0 +1,120 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <ng-container *ngIf="loading; else content">
+      <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+      </div>
+    </ng-container>
+    <ng-template #content>
+      <div class="card mat-elevation-z8 p-2">
+        <!-- <div class="col-6">
+            <div class="alert alert-success">
+              <i class="fa fa-info-circle"></i>
+              <b class="font-weight-bolder">Selecione os contatos marcando as caixas de seleção à esquerda antes de enviar a mensagem</b>
+            </div>
+          </div> -->
+        <div class="search-container row p-2">
+          <div class="col-6">
+            <mat-form-field appearance="standard">
+              <mat-label>Buscar por Telefone</mat-label>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Digite para buscar" />
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-form-field appearance="standard">
+              <mat-label>Buscar por Avaliação</mat-label>
+              <mat-select [(ngModel)]="selectedAvaliacao" placeholder="Selecione uma avaliação">
+                <mat-option [value]="null">Nenhuma</mat-option>
+                <mat-option *ngFor="let avaliacao of avaliacoes" [value]="avaliacao.avaliacao_nome">{{ avaliacao.avaliacao_nome }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="filter-container row p-2">
+          <div class="col-6">
+            <mat-form-field appearance="standard">
+              <mat-label>Filtrar por Turma</mat-label>
+              <mat-select [(ngModel)]="selectedTurma" placeholder="Selecione uma turma">
+                <mat-option [value]="null">Nenhuma</mat-option>
+                <mat-option *ngFor="let turma of turmas" [value]="turma.turma_nome">{{ turma.turma_nome }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-form-field appearance="standard">
+              <mat-label>Filtrar por Matéria</mat-label>
+              <mat-select [(ngModel)]="selectedMateria" placeholder="Selecione uma matéria">
+                <mat-option [value]="null">Nenhuma</mat-option>
+                <mat-option *ngFor="let materia of materias" [value]="materia.materia_nome">{{ materia.materia_nome }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="d-flex row p-2 justify-content-xl-between">
+          <div class="col-3">
+            <button mat-raised-button color="primary" (click)="applyFilters()">Pesquisar</button
+            ><button mat-raised-button (click)="enviarSelecionados()" class="m-1 btn-success">Enviar Mensagem ({{ this.selectedCount }})</button>
+          </div>
+          <!-- <div class="col-3">
+              <button mat-raised-button color="accent" (click)="enviarEmMassa()" class="m-1">Enviar em Massa</button>
+            </div> -->
+        </div>
+      </div>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table table-hover">
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? toggleSelection(element) : null" [checked]="selection.isSelected(element)"> </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Telefone Column -->
+        <ng-container matColumnDef="telefone">
+          <th mat-header-cell *matHeaderCellDef>Telefone</th>
+          <td mat-cell *matCellDef="let element">{{ element.telefone }}</td>
+        </ng-container>
+
+        <!-- Aluno Column -->
+        <ng-container matColumnDef="aluno_nome">
+          <th mat-header-cell *matHeaderCellDef>Aluno</th>
+          <td mat-cell *matCellDef="let element">{{ element.aluno_nome }}</td>
+        </ng-container>
+
+        <!-- Materia Column -->
+        <ng-container matColumnDef="materia_nome">
+          <th mat-header-cell *matHeaderCellDef>Matéria</th>
+          <td mat-cell *matCellDef="let element">{{ element.materia_nome }}</td>
+        </ng-container>
+
+        <!-- Nota Column -->
+        <ng-container matColumnDef="nota">
+          <th mat-header-cell *matHeaderCellDef>Nota</th>
+          <td mat-cell *matCellDef="let element">{{ element.nota }}</td>
+        </ng-container>
+
+        <!-- Avaliacao Column -->
+        <ng-container matColumnDef="avaliacao_nome">
+          <th mat-header-cell *matHeaderCellDef>Avaliação</th>
+          <td mat-cell *matCellDef="let element">{{ element.avaliacao_nome }}</td>
+        </ng-container>
+
+        <!-- Turma Column -->
+        <ng-container matColumnDef="turma_nome">
+          <th mat-header-cell *matHeaderCellDef>Turma</th>
+          <td mat-cell *matCellDef="let element">{{ element.turma_nome }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </ng-template>
+  </div>
+</div>

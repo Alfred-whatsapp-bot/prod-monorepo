@@ -22,7 +22,7 @@ export class TableListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.service.getMessages().subscribe((data: Message[]) => {
+    this.service.getMessage().subscribe((data: Message[]) => {
       this.data = data;
     });
   }

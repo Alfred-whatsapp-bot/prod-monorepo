@@ -1,1 +1,51 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="cards-grid">
+    <!-- Card 1 -->
+    <div class="card" [@fadeInUp]="'in'" [style.animation-delay]="'0.1s'">
+      <div class="card-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+      <div class="card-content">
+        <h3>Total Conversas</h3>
+        <p class="number">{{ totalConversas }}</p>
+        <p class="trend positive"><i class="fas fa-arrow-up"></i> +5% desde ontem</p>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card" [@fadeInUp]="'in'" [style.animation-delay]="'0.2s'">
+      <div class="card-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="card-content">
+        <h3>Tempo Médio Resposta</h3>
+        <p class="number">{{ tempoMedioResposta }}s</p>
+        <p class="trend negative"><i class="fas fa-arrow-down"></i> -2% desde ontem</p>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card" [@fadeInUp]="'in'" [style.animation-delay]="'0.3s'">
+      <div class="card-icon">
+        <i class="fas fa-smile"></i>
+      </div>
+      <div class="card-content">
+        <h3>Satisfação Usuários</h3>
+        <p class="number">{{ satisfacaoUsuarios }}%</p>
+        <p class="trend positive"><i class="fas fa-arrow-up"></i> +1% desde ontem</p>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="card" [@fadeInUp]="'in'" [style.animation-delay]="'0.4s'">
+      <div class="card-icon">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="card-content">
+        <h3>Automações Ativas</h3>
+        <p class="number">{{ automacoesAtivas }}</p>
+        <p class="trend neutral"><i class="fas fa-minus"></i> Sem alteração</p>
+      </div>
+    </div>
+  </div>
+</div>

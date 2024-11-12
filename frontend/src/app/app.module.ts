@@ -44,6 +44,8 @@ import { TableListComponent } from "./pages/produtos/table-list.component";
 import { DashboardComponent } from "./pages/dashboard/dashboard.component";
 import { ModalComponent } from "./components/modal/modal.component";
 import { MatDialogModule } from "@angular/material/dialog";
+import { TemplateMensagemComponent } from './pages/template-mensagem/template-mensagem.component';
+import { ContatosComponent } from './pages/contatos/contatos.component';
 
 @NgModule({
   imports: [
@@ -98,6 +100,8 @@ import { MatDialogModule } from "@angular/material/dialog";
     TableListComponent,
     DashboardComponent,
     ModalComponent,
+    TemplateMensagemComponent,
+    ContatosComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

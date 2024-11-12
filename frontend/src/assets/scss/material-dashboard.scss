@@ -4,7 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=PT+Serif&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
 
-$custom-app-primary: mat-palette($mat-teal, A200);
+$custom-app-primary: mat-palette($mat-teal);
 $custom-app-secondary: mat-palette($mat-teal, A400);
 $custom-app-warn: mat-palette($mat-teal, A700);
 

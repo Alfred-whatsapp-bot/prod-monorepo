@@ -5,16 +5,17 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { Users } from "../models/user.model.js";
 import { Uploads } from "../models/uploads.model.js";
 import bcrypt from "bcryptjs";
 import bodyParser from "body-parser";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-import { session, stop } from "./chatbot.js";
+import { session, stop, restart, sendMessageEmMassa, sendMessageByContact } from "./chatbot.js";
 import multer from "multer";
 import zlib from "zlib";
-import { Messages } from "../models/message.model.js";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 /**
  * Create a chatbot http Qr login
@@ -23,9 +24,9 @@ import { Messages } from "../models/message.model.js";
  */
 export async function httpCtrl(name, port) {
   const app = express();
-  const upload = multer({ dest: "uploads/" });
   app.use(cors());
-  app.use(bodyParser.json()); // support json encoded bodies
+  const upload = multer({ dest: "uploads/" });
+  app.use(bodyParser.json());
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
@@ -40,30 +41,38 @@ export async function httpCtrl(name, port) {
         next();
         return authorized;
       } else if (email && senha) {
-        Users.findOne({ where: { email: email } }).then((user) => {
-          if (user && bcrypt.compare(senha, user.senha)) {
-            // Create token
-            const token = jwt.sign(
-              { user_id: user._id, email },
-              process.env.TOKEN_KEY,
-              {
-                expiresIn: "7 days",
-              }
-            );
-            // save user token in database
-            user.token = token;
-            user.save();
-            // user
-            let ret = {
-              user: user.nome,
-              token: token,
+        prisma.usuarios
+          .findUnique({
+            where: {
               email: email,
-            };
-            res.status(200).json(ret);
-            authorized = true;
-            return authorized;
-          }
-        });
+            },
+          })
+          .then((user) => {
+            if (user && bcrypt.compare(senha, user.senha)) {
+              const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, {
+                expiresIn: "7 days",
+              });
+              // save user token in database
+              user.token = token;
+              prisma.usuarios.update({
+                where: {
+                  email: email,
+                },
+                data: {
+                  token: token,
+                },
+              });
+              // user
+              let ret = {
+                user: user.nome,
+                token: token,
+                email: email,
+              };
+              res.status(200).json(ret);
+              authorized = true;
+              return authorized;
+            }
+          });
       } else {
         res.status(401).send("Unauthorized");
         return authorized;
@@ -97,61 +106,124 @@ export async function httpCtrl(name, port) {
       res.status(500).json(error);
     }
   });
-  app.post("/api/handleBot", authenticate, (req, res, next) => {
-    const name = req.email.email;
+  app.post("/api/handleBot", async (req, res, next) => {
     const { conversationName, order } = req.body;
-    if (order == "stop") {
-      stop(name);
-      res.status(200).send(`Bot stopped.`);
-      return;
-    }
-    const conversationPath = `conversations/${conversationName}.js`;
-    let array = [];
-    const conversation = fs.readFile(
-      path.join(__dirname, conversationPath),
-      "utf-8",
-      (err, data) => {
-        if (err) {
-          throw err;
-        }
-        const exported = import(
-          `./conversations/${conversationName}.js?param=${name}`
-        );
-        exported.then((module) => {
-          array = module.default;
-          if (!name || !array) {
-            res.status(500).send("Something went wrong with session params.");
-          } else {
-            session(name, array, order);
-            res.status(200).send(`Bot started.`);
-          }
-        });
+
+    try {
+      if (order === "stop") {
+        await stop(conversationName);
+        res.status(200).send(`Bot stopped.`);
+        return;
       }
-    );
+
+      if (order === "restart") {
+        await restart(conversationName);
+        res.status(200).send(`Bot restarted.`);
+        return;
+      }
+
+      const conversationPath = `conversations/conversation.js`;
+      const data = await fs.promises.readFile(path.join(__dirname, conversationPath), "utf-8");
+      const module = await import(`./conversations/conversation.js?param=${conversationName}`);
+      const array = module.default;
+
+      if (!conversationName || !array) {
+        res.status(500).send("Something went wrong with session params.");
+      } else {
+        await session(conversationName, array);
+        res.status(200).send("Session started.");
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+  app.get("/api/getmessage", authenticate, async (req, res) => {
+    const name = req.email.email;
+    const message = await prisma.message.findFirst({
+      where: { session: name },
+    });
+
+    res.send(message);
+  });
+  app.get("/api/getcontatos", authenticate, async (req, res) => {
+    const name = req.email.email;
+    const contacts = await prisma.contatos.findMany({
+      where: { session: name },
+    });
+
+    res.send(contacts);
+  });
+  app.get("/api/getturmas", authenticate, async (req, res) => {
+    try {
+      const turmas = await prisma.contatos.findMany({
+        distinct: ["turma_nome"],
+        select: {
+          turma_nome: true,
+        },
+      });
+      res.status(200).json(turmas);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  });
+  app.get("/api/getmaterias", authenticate, async (req, res) => {
+    try {
+      const materias = await prisma.contatos.findMany({
+        distinct: ["materia_nome"],
+        select: {
+          materia_nome: true,
+        },
+      });
+      res.status(200).json(materias);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  });
+  app.get("/api/getavaliacoes", authenticate, async (req, res) => {
+    try {
+      const avaliacoes = await prisma.contatos.findMany({
+        distinct: ["avaliacao_nome"],
+        select: {
+          avaliacao_nome: true,
+        },
+      });
+      res.status(200).json(avaliacoes);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  });
+  app.post("/api/sendMessage", authenticate, async (req, res, next) => {
+    const { email } = req.email;
+    const { emMassa, telefones } = req.body;
+
+    try {
+      if (!email) {
+        res.status(400).send("Sessão expirada.");
+        return;
+      }
+
+      if (emMassa) await sendMessageEmMassa(email);
+
+      if (!emMassa && telefones.length > 0) {
+        await sendMessageByContact(email, telefones);
+      }
+
+      res.status(200);
+    } catch (err) {
+      next(err);
+    }
   });
   app.get("/api/data", authenticate, (req, res, next) => {
     const name = req.email.email;
     const infoPath = `tokens/${name}/info.json`;
     const qrPath = `tokens/${name}/qr.json`;
     const sessPath = `tokens/${name}/session.json`;
-    const info = fs.existsSync(infoPath)
-      ? JSON.parse(fs.readFileSync(infoPath))
-      : null;
-    const qr = fs.existsSync(qrPath)
-      ? JSON.parse(fs.readFileSync(qrPath))
-      : null;
-    const sess = fs.existsSync(sessPath)
-      ? JSON.parse(fs.readFileSync(sessPath))
-      : null;
+    const info = fs.existsSync(infoPath) ? JSON.parse(fs.readFileSync(infoPath)) : null;
+    const qr = fs.existsSync(qrPath) ? JSON.parse(fs.readFileSync(qrPath)) : null;
+    const sess = fs.existsSync(sessPath) ? JSON.parse(fs.readFileSync(sessPath)) : null;
 
-    const logs = fs
-      .readFileSync("logs/logs.log")
-      .toString()
-      .replace(/\n/g, "<br>");
-    const flow = fs
-      .readFileSync("logs/conversations.log")
-      .toString()
-      .replace(/\n/g, "<br>");
+    const logs = fs.readFileSync("logs/logs.log").toString().replace(/\n/g, "<br>");
+    const flow = fs.readFileSync("logs/conversations.log").toString().replace(/\n/g, "<br>");
     res.json({
       info,
       session: sess,
@@ -163,9 +235,7 @@ export async function httpCtrl(name, port) {
   app.get("/api/connection", authenticate, async (req, res, next) => {
     const name = req.email.email;
     const connectionPath = `tokens/${name}/connection.json`;
-    const connection = fs.existsSync(connectionPath)
-      ? JSON.parse(fs.readFileSync(connectionPath))
-      : null;
+    const connection = fs.existsSync(connectionPath) ? JSON.parse(fs.readFileSync(connectionPath)) : null;
     res.json({ status: connection?.status });
   });
   app.get("/api/controls/log/clear", (req, res, next) => {
@@ -206,13 +276,9 @@ export async function httpCtrl(name, port) {
         });
 
         // Create token
-        const token = jwt.sign(
-          { user_id: user._id, email },
-          process.env.TOKEN_KEY,
-          {
-            expiresIn: "24h",
-          }
-        );
+        const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, {
+          expiresIn: "24h",
+        });
         // save user token
         user.token = token;
 
@@ -279,13 +345,53 @@ export async function httpCtrl(name, port) {
   app.post("/api/login", authenticate, (req, res) => {
     res.send("Successfully logged in");
   });
-  app.get("/api/getmessages", async (req, res) => {
-    const messages = await Messages.findAll();
-    res.json(messages);
+
+  // Manipulador global de exceções
+  process.on("uncaughtException", async (error) => {
+    console.error("Uncaught Exception:", error);
+    //await cleanupBotSession();
+    process.exit(1); // Encerra o processo após a limpeza
   });
-  app.listen(port, () => {
-    console.log(
-      `[${name}] Http chatbot control running on http://localhost:${port}/`
-    );
+
+  async function cleanupBotSession() {
+    try {
+      // Encerra a sessão do bot
+      await stop("admin@example.com"); // Passe o nome da sessão, se necessário
+
+      // Limpa a pasta tokens
+      const tokensDir = path.join(__dirname, "../../tokens");
+      if (fs.existsSync(tokensDir)) {
+        fs.readdir(tokensDir, (err, files) => {
+          if (err) throw err;
+
+          for (const file of files) {
+            fs.unlink(path.join(tokensDir, file), (err) => {
+              if (err) throw err;
+            });
+          }
+        });
+      }
+
+      console.log("Sessão do bot encerrada e pasta tokens limpa.");
+    } catch (error) {
+      console.error("Erro durante a limpeza:", error);
+    }
+  }
+
+  app.listen(port, async () => {
+    const tokensDir = path.join(__dirname, "../tokens");
+    if (fs.existsSync(tokensDir)) {
+      fs.readdir(tokensDir, (err, files) => {
+        if (err) throw err;
+
+        for (const file of files) {
+          fs.rm(path.join(tokensDir, file), { recursive: true, force: true }, (err) => {
+            if (err) throw err;
+          });
+        }
+      });
+    }
+
+    console.log(`[${name}] Http chatbot control running on http://localhost:${port}/`);
   });
 }

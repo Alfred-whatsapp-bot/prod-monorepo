@@ -33,7 +33,10 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    console.log("isLogged: ", this.isLogged);
-    return this.isLogged;
+    if (localStorage.getItem("token")) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
