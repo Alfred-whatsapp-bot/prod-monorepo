@@ -23,10 +23,30 @@ const prisma = new PrismaClient();
  * @param {Number} port
  */
 export async function httpCtrl(name, port) {
+  const allowedOrigins = ["https://gleeful-wisp-87139e.netlify.app", "http://localhost:4200"];
   const app = express();
-  app.use(cors());
-  const upload = multer({ dest: "uploads/" });
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        // Permitir requisições sem origin (como apps mobile ou Postman)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+      optionsSuccessStatus: 200,
+    })
+  );
   app.use(bodyParser.json());
+  app.options("*", cors());
+
+  const upload = multer({ dest: "uploads/" });
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   // app.use(express.static(path.join(__dirname, "dist/frontend")));
