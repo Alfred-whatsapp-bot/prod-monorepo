@@ -23,7 +23,7 @@ const prisma = new PrismaClient();
  * @param {Number} port
  */
 export async function httpCtrl(name, port) {
-  const allowedOrigins = ["https://gleeful-wisp-87139e.netlify.app", "http://localhost:4200"];
+  const allowedOrigins = ["https://gleeful-wisp-87139e.netlify.app", "https://portal-nda-front.onrender.com", "http://localhost:4200"];
   const app = express();
   app.use(
     cors({
